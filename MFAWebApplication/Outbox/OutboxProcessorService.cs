@@ -1,13 +1,20 @@
 ﻿
+using Confluent.Kafka;
 using MFAWebApplication.Context;
 using MFAWebApplication.Kafka;
-using System.Threading;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Threading;
 
 namespace MFAWebApplication.Outbox;
+
 public class OutboxProcessorService : BackgroundService
 {
+    private const int OUTBOX_PROCESSOR_FREQUENCY = 3;
+    private const int BATCH_SIZE = 100;
+
     private readonly IServiceProvider _serviceProvider;
     private readonly KafkaProducerService _kafka;
+    private readonly AsyncAutoResetEvent _signal = new(false);
 
     public OutboxProcessorService(IServiceProvider serviceProvider, KafkaProducerService kafka)
     {
@@ -15,38 +22,59 @@ public class OutboxProcessorService : BackgroundService
         _kafka = kafka;
     }
 
+    public void NotifyNewOutboxMessage()
+    {
+        _signal.Set();
+    }
+
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        var periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(OUTBOX_PROCESSOR_FREQUENCY));
         while (!cancellationToken.IsCancellationRequested)
         {
-            using var scope = _serviceProvider.CreateScope();
-            var database = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
 
-            var outboxMessages = database.OutboxMessages
-                .Where(m => !m.Processed)
-                .OrderBy(m => m.CreatedAt)
-                .Take(10)
-                .ToList();
+            var signalTask = _signal.WaitAsync(cancellationToken);
+            var timerTask = periodicTimer.WaitForNextTickAsync(cancellationToken).AsTask();
 
-            foreach (var message in outboxMessages)
+            var completed = await Task.WhenAny(signalTask, timerTask);
+            if (completed.IsCanceled || cancellationToken.IsCancellationRequested)
             {
-                try
-                {
-                    await _kafka.ProduceAsync(message);
-                    message.Processed = true;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"Outbox Error: {e.Message}");
-                }
+                break;
             }
 
-            if (outboxMessages.Any())
-            {
-                await database.SaveChangesAsync(cancellationToken);
-            }
+            await ProcessPendingMessageAsync(cancellationToken);
 
-            await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
         }
+    }
+
+    private async Task ProcessPendingMessageAsync(CancellationToken cancellationToken)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var database = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+
+        var outboxMessages = await database.OutboxMessages
+            .Where(m => !m.Processed)
+            .OrderBy(m => m.CreatedAt)
+            .Take(BATCH_SIZE)
+            .ToListAsync(cancellationToken);
+
+
+        if (outboxMessages.Count == 0)
+            return;
+
+        foreach (var message in outboxMessages)
+        {
+            try
+            {
+                await _kafka.ProduceAsync(message);
+                message.Processed = true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Outbox Error: {e.Message}");
+            }
+        }
+
+        await database.SaveChangesAsync(cancellationToken);
     }
 }

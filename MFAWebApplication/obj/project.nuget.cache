@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "toRlOHEnRvQ=",
+  "dgSpecHash": "zJ4rIZu28ug=",
   "success": true,
   "projectFilePath": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\MFAWebApplication.csproj",
   "expectedPackageFiles": [
@@ -48,6 +48,10 @@
     "C:\\Users\\danut\\.nuget\\packages\\microsoft.net.stringtools\\17.11.4\\microsoft.net.stringtools.17.11.4.nupkg.sha512",
     "C:\\Users\\danut\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
     "C:\\Users\\danut\\.nuget\\packages\\microsoft.openapi\\1.6.14\\microsoft.openapi.1.6.14.nupkg.sha512",
+    "C:\\Users\\danut\\.nuget\\packages\\microsoft.visualstudio.threading\\17.14.15\\microsoft.visualstudio.threading.17.14.15.nupkg.sha512",
+    "C:\\Users\\danut\\.nuget\\packages\\microsoft.visualstudio.threading.analyzers\\17.14.15\\microsoft.visualstudio.threading.analyzers.17.14.15.nupkg.sha512",
+    "C:\\Users\\danut\\.nuget\\packages\\microsoft.visualstudio.threading.only\\17.14.15\\microsoft.visualstudio.threading.only.17.14.15.nupkg.sha512",
+    "C:\\Users\\danut\\.nuget\\packages\\microsoft.visualstudio.validation\\17.8.8\\microsoft.visualstudio.validation.17.8.8.nupkg.sha512",
     "C:\\Users\\danut\\.nuget\\packages\\microsoft.win32.registry\\5.0.0\\microsoft.win32.registry.5.0.0.nupkg.sha512",
     "C:\\Users\\danut\\.nuget\\packages\\mongodb.bson\\3.5.0\\mongodb.bson.3.5.0.nupkg.sha512",
     "C:\\Users\\danut\\.nuget\\packages\\mongodb.driver\\3.5.0\\mongodb.driver.3.5.0.nupkg.sha512",

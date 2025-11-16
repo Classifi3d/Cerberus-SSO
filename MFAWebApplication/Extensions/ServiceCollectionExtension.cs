@@ -11,13 +11,13 @@ using MFAWebApplication.Outbox;
 using MFAWebApplication.Projections;
 using MFAWebApplication.Services;
 using System.Reflection;
+using static CSharpFunctionalExtensions.Result;
 namespace MFAWebApplication.Extensions;
 
 public static class ServiceCollectionExtension
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        MessagePackSerializer.DefaultOptions = MessagePackSerializerOptions.Standard.WithResolver(MessagePack.Resolvers.ContractlessStandardResolver.Instance);
 
         // Infrastructure
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -50,17 +50,18 @@ public static class ServiceCollectionExtension
         services.AddScoped<ISecurityService, SecurityService>();
         services.AddAutoMapper(assemblies);
         services.AddSingleton(MapperConfiguration.InitializeAutomapper());
-        services.AddMemoryCache(); 
+        services.AddMemoryCache();
 
         // Messaging Queue
         // Sender 
         services.AddSingleton<KafkaProducerService>();
-        services.AddHostedService<KafkaConsumerService>();
-        services.AddHostedService<OutboxProcessorService>();
-        //MessagePackSerializer.DefaultOptions = MessagePackSerializerOptions.Standard
-        //    .WithCompression(MessagePackCompression.Lz4BlockArray);
+        services.AddSingleton<OutboxProcessorService>();
+        services.AddHostedService(sp => sp.GetRequiredService<OutboxProcessorService>());
+
+        MessagePackSerializer.DefaultOptions = MessagePackSerializerOptions.Standard.WithResolver(MessagePack.Resolvers.ContractlessStandardResolver.Instance);
 
         // Receiver 
+        services.AddHostedService<KafkaConsumerService>();
         services.AddScoped<UserCreatedProjector>();
         var projectorMap = new Dictionary<string, Type>
         {
@@ -75,9 +76,6 @@ public static class ServiceCollectionExtension
         {
             opts.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
         });
-
-
-
 
         return services;
     }

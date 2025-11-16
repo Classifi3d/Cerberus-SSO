@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
-using MessagePack;
-using MFAWebApplication.Outbox;
 using MFAWebApplication.Projections;
+using System;
+using System.Text;
 
 public class KafkaConsumerService : BackgroundService
 {
@@ -11,6 +11,9 @@ public class KafkaConsumerService : BackgroundService
     private readonly IConsumer<Null, byte[]> _consumer;
     private readonly IDictionary<string, Type> _projectorTypes;
     private bool _appStarted = false;
+
+    private const int CONSUMER_PROCESS_FREQUENCY = 3;
+    private const int BATCH_SIZE = 100;
 
     public KafkaConsumerService(
         IHostApplicationLifetime appLifetime,
@@ -25,11 +28,15 @@ public class KafkaConsumerService : BackgroundService
             BootstrapServers = config["Kafka:BootstrapServers"],
             GroupId = "read-db-consumer",
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            //EnableAutoCommit = true,
             EnableAutoCommit = false,
-            StatisticsIntervalMs = 5000,
-            FetchWaitMaxMs = 5,
-            FetchMinBytes = 1,
+            // Fetch settings
+            FetchWaitMaxMs = 50,                   // Wait max 50ms for data
+            FetchMinBytes = 1,                     // Immediately deliver messages
+            MaxPartitionFetchBytes = 4 * 1024 * 1024, // 4 MB per partition
+            // Queueing / batching
+            QueuedMinMessages = 1000,              // Minimum buffered
+            QueuedMaxMessagesKbytes = 51200,       // 50 MB local queue
+            // Heartbeat / session
             SessionTimeoutMs = 10000,
             MaxPollIntervalMs = 300000,
         };
@@ -51,48 +58,87 @@ public class KafkaConsumerService : BackgroundService
 
         while (!_appStarted && !stoppingToken.IsCancellationRequested)
         {
-            await Task.Delay(100, stoppingToken);
+            await Task.Delay(1000, stoppingToken);
         }
+
+        int processedSinceCommit = 0;
+        var lastCommitTime = DateTime.UtcNow;
 
         try
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                ConsumeResult<Null, byte[]> result;
+
                 try
                 {
-                    var result = _consumer.Consume(stoppingToken);
-                    if (result?.Message?.Value == null) continue;
-
-                    var envelope = MessagePackSerializer.Deserialize<OutboxMessage>(result.Message.Value);
-
-                    if (!_projectorTypes.TryGetValue(envelope.Type, out var projType))
-                    {
-                        _consumer.Commit(result);
-                        continue;
-                    }
-
-                    using var scope = _serviceProvider.CreateScope();
-                    var projector = (IEventProjector)scope.ServiceProvider.GetRequiredService(projType);
-
-                    await projector.ProjectAsync(envelope.Payload, stoppingToken);
-                    _consumer.Commit(result);
-                    Console.WriteLine($"Processed event type: {envelope.Type}");
+                    result = _consumer.Consume(stoppingToken);
                 }
-                catch (OperationCanceledException) { 
-                    break; 
-                }
-                catch (Exception ex)
+                catch (OperationCanceledException)
                 {
+                    break;
+                }
 
-                    Console.WriteLine(ex);
+                if (result?.Message?.Value == null)
+                    continue;
+
+                string? type = null;
+                var headers = result.Message.Headers;
+                if (headers != null)
+                {
+                    var typeHeader = headers.GetLastBytes("type");
+                    if (typeHeader != null)
+                    {
+                        type = Encoding.UTF8.GetString(typeHeader);
+                    }
+                }
+
+                if (string.IsNullOrEmpty(type))
+                {
+                    _consumer.Commit(result);
+                    continue;
+                }
+
+                if (!_projectorTypes.TryGetValue(type, out var projType))
+                {
+                    _consumer.Commit(result);
+                    continue;
+                }
+                if (stoppingToken.IsCancellationRequested)
+                    Console.WriteLine("WARNING: host requested shutdown during processing");
+
+                using var scope = _serviceProvider.CreateScope();
+                var projector = (IEventProjector)scope.ServiceProvider.GetRequiredService(projType);
+
+                var payload = result.Message.Value;
+                await projector.ProjectAsync(payload, CancellationToken.None);
+
+                processedSinceCommit++;
+                if ((processedSinceCommit >= BATCH_SIZE) ||
+                    (DateTime.UtcNow - lastCommitTime) >= TimeSpan.FromSeconds(CONSUMER_PROCESS_FREQUENCY))
+                {
+                    try
+                    {
+                        _consumer.Commit();
+                        lastCommitTime = DateTime.UtcNow;
+                        processedSinceCommit = 0;
+                        Console.WriteLine($"Batch of size {BATCH_SIZE} commited");
+                    }
+                    catch (KafkaException e)
+                    {
+                        Console.WriteLine($"Batch commited error: {e}");
+                    }
                 }
             }
         }
         finally
         {
+            try
+            {
+                _consumer.Commit();
+            }
+            catch { }
             _consumer.Close();
         }
-
     }
-
 }

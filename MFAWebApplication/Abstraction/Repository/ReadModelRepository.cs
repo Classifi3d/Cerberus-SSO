@@ -36,16 +36,48 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
 
     public async Task<bool> UpsertIfNewerConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        var id = GetEntityId(entity);
+        try {
+            var id = GetEntityId(entity);
+            var filter = Builders<TEntity>.Filter.And(
+                Builders<TEntity>.Filter.Eq("_id", id),
+                Builders<TEntity>.Filter.Lt("concurrencyIndex", entity.ConcurrencyIndex)
+            );
 
-        var filter = Builders<TEntity>.Filter.And(
-            Builders<TEntity>.Filter.Eq("_id", id),
-            Builders<TEntity>.Filter.Lt(nameof(ReadModel.ConcurrencyIndex), entity.ConcurrencyIndex)
-        );
-        var options = new ReplaceOptions { IsUpsert = true };
-        var result = await _collection.ReplaceOneAsync(filter, entity, options, cancellationToken);
+            var update = new List<UpdateDefinition<TEntity>>();
 
-        return result.IsAcknowledged && (result.UpsertedId != null || result.ModifiedCount > 0);
+            var props = typeof(TEntity).GetProperties();
+            foreach (var prop in typeof(TEntity).GetProperties())
+            {
+                var name = prop.Name;
+
+                if (name.Equals("_id", StringComparison.OrdinalIgnoreCase) ||
+                    name.Equals("Id", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var value = prop.GetValue(entity);
+                update.Add(Builders<TEntity>.Update.Set(name, value));
+            }
+            update.Add(Builders<TEntity>.Update.SetOnInsert("_id", id));
+
+            var updateDefinition = Builders<TEntity>.Update.Combine(update);
+
+            var options = new UpdateOptions { IsUpsert = true };
+            var result = await _collection.UpdateOneAsync(filter, updateDefinition, options, cancellationToken);
+
+            try
+            {
+                return result.IsAcknowledged && (result.UpsertedId != null || result.ModifiedCount > 0);
+            }
+            catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+            {
+                return false;
+            }
+        }
+        catch 
+        {
+            return false; 
+        }
+        
     }
 
     public async Task<bool> DeleteIfMatchingConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default)

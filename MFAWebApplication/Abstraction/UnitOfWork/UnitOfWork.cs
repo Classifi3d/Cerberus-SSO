@@ -10,11 +10,11 @@ public class UnitOfWork<TContext> : IUnitOfWork, IDisposable
     private readonly TContext _dbContext;
     private readonly Dictionary<Type, object> _repositories = new Dictionary<Type, object>();
     private readonly List<object> _pendingOutboxEvent = new List<object>();
-
-    public UnitOfWork(
-        TContext dbContext)
+    private readonly OutboxProcessorService _outboxProcessor;
+    public UnitOfWork(TContext dbContext, OutboxProcessorService outboxProcessor)
     {
         _dbContext = dbContext;
+        _outboxProcessor = outboxProcessor;
     }
 
     public IRepository<TEntity> Repository<TEntity>() where TEntity : class
@@ -52,6 +52,7 @@ public class UnitOfWork<TContext> : IUnitOfWork, IDisposable
 
             await _dbContext.Set<OutboxMessage>().AddRangeAsync(serializedOutbox, cancellationToken);
             _pendingOutboxEvent.Clear();
+            _outboxProcessor.NotifyNewOutboxMessage();
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 

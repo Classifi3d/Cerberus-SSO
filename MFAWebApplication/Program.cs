@@ -29,7 +29,7 @@ builder
     });
 
 // Middleware Endpoint Rate Limiting
-builder.Services.AddCustomRateLimiters();
+//builder.Services.AddCustomRateLimiters();
 
 // JWT Token
 builder
@@ -86,7 +86,7 @@ if ( app.Environment.IsDevelopment() )
     app.UseSwaggerUI();
 }
 
-app.UseRateLimiter();
+//app.UseRateLimiter();
 app.UseCors(allowSpecificOrigin);
 app.UseHttpsRedirection();
 app.UseAuthorization();
