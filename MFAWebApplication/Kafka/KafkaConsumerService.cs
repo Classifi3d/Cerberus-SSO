@@ -1,7 +1,8 @@
 ﻿using Confluent.Kafka;
 using MFAWebApplication.Projections;
-using System;
 using System.Text;
+
+namespace MFAWebApplication.Kafka;
 
 public class KafkaConsumerService : BackgroundService
 {
@@ -13,7 +14,7 @@ public class KafkaConsumerService : BackgroundService
     private bool _appStarted = false;
 
     private const int CONSUMER_PROCESS_FREQUENCY = 3;
-    private const int BATCH_SIZE = 100;
+    private const int BATCH_SIZE = 1000;
 
     public KafkaConsumerService(
         IHostApplicationLifetime appLifetime,

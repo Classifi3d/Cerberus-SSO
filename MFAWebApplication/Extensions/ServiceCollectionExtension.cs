@@ -57,6 +57,10 @@ public static class ServiceCollectionExtension
         services.AddSingleton<KafkaProducerService>();
         services.AddSingleton<OutboxProcessorService>();
         services.AddHostedService(sp => sp.GetRequiredService<OutboxProcessorService>());
+        // -- OutboxTest
+        //services.AddHostedService<OutboxBackgroundService>();
+        //services.AddScoped<OutboxProcessor>();
+
 
         MessagePackSerializer.DefaultOptions = MessagePackSerializerOptions.Standard.WithResolver(MessagePack.Resolvers.ContractlessStandardResolver.Instance);
 

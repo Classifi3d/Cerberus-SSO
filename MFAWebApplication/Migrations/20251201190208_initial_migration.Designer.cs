@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MFAWebApplication.Migrations
 {
     [DbContext(typeof(WriteDbContext))]
-    [Migration("20251107214124_initial migration")]
-    partial class initialmigration
+    [Migration("20251201190208_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,14 +83,22 @@ namespace MFAWebApplication.Migrations
                         .IsRequired()
                         .HasColumnType("bytea");
 
-                    b.Property<bool>("Processed")
-                        .HasColumnType("boolean");
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProcessedAt")
+                        .HasDatabaseName("IX_Outbox_Processed_At")
+                        .HasFilter("\"ProcessedAt\" IS NOT NULL");
+
+                    b.HasIndex("ProcessedAt", "CreatedAt")
+                        .HasDatabaseName("IX_Outbox_Pending")
+                        .HasFilter("\"ProcessedAt\" IS NULL");
 
                     b.ToTable("OutboxMessages");
                 });

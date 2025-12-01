@@ -9,7 +9,7 @@ public class KafkaProducerService
     private readonly IProducer<Null, byte[]> _producer;
     private readonly string _topic;
 
-    private const int BATCH_SIZE = 100;
+    private const int BATCH_SIZE = 1000;
 
     public KafkaProducerService(
         IConfiguration config)

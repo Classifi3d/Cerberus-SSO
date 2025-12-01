@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MFAWebApplication.Migrations
 {
     /// <inheritdoc />
-    public partial class initialmigration : Migration
+    public partial class initial_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,8 +18,8 @@ namespace MFAWebApplication.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Type = table.Column<string>(type: "text", nullable: false),
                     Payload = table.Column<byte[]>(type: "bytea", nullable: false),
-                    Processed = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -44,6 +44,18 @@ namespace MFAWebApplication.Migrations
                 {
                     table.PrimaryKey("PK_User", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Outbox_Pending",
+                table: "OutboxMessages",
+                columns: new[] { "ProcessedAt", "CreatedAt" },
+                filter: "\"ProcessedAt\" IS NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Outbox_Processed_At",
+                table: "OutboxMessages",
+                column: "ProcessedAt",
+                filter: "\"ProcessedAt\" IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_Email",

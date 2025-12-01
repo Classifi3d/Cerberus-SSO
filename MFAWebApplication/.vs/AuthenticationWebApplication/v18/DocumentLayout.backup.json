@@ -3,33 +3,49 @@
   "WorkspaceRootPath": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\abstraction\\repository\\readmodelrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:abstraction\\repository\\readmodelrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Migrations\\20251201190208_initial_migration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20251201190208_initial_migration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\kafka\\kafkaconsumerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:kafka\\kafkaconsumerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\context\\writedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:context\\writedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Migrations\\20251201190048_initial_migration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Migrations\\20251201190048_initial_migration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\outbox\\outboxprocessorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:outbox\\outboxprocessorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\kafka\\kafkaproducerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:kafka\\kafkaproducerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\outbox\\outboxtest\\outboxbackgroundservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:outbox\\outboxtest\\outboxbackgroundservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\context\\readdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:context\\readdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\outbox\\outboxtest\\outboxprocessor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:outbox\\outboxtest\\outboxprocessor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\outbox\\outboxtest\\outboxupdate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:outbox\\outboxtest\\outboxupdate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\extensions\\servicecollectionextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:extensions\\servicecollectionextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|c:\\users\\danut\\projects\\multi-factor-authentication\\mfawebapplication\\outbox\\outboxmessage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ACD0E321-8C57-4CF9-9CDF-5ECF34B5BB65}|MFAWebApplication.csproj|solutionrelative:outbox\\outboxmessage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
     {
-      "Orientation": 0,
+      "Orientation": 1,
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedWidth": 508,
+          "DockedHeight": 276,
           "SelectedChildIndex": 2,
           "Children": [
             {
@@ -43,71 +59,118 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ReadModelRepository.cs",
-              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Abstraction\\Repository\\ReadModelRepository.cs",
-              "RelativeDocumentMoniker": "Abstraction\\Repository\\ReadModelRepository.cs",
-              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Abstraction\\Repository\\ReadModelRepository.cs",
-              "RelativeToolTip": "Abstraction\\Repository\\ReadModelRepository.cs",
-              "ViewState": "AgIAACYAAAAAAAAAAAAswEsAAAAOAAAAAAAAAA==",
+              "Title": "20251201190208_initial_migration.cs",
+              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Migrations\\20251201190208_initial_migration.cs",
+              "RelativeDocumentMoniker": "Migrations\\20251201190208_initial_migration.cs",
+              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Migrations\\20251201190208_initial_migration.cs",
+              "RelativeToolTip": "Migrations\\20251201190208_initial_migration.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAqwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-15T16:14:13.215Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "KafkaConsumerService.cs",
-              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Kafka\\KafkaConsumerService.cs",
-              "RelativeDocumentMoniker": "Kafka\\KafkaConsumerService.cs",
-              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Kafka\\KafkaConsumerService.cs",
-              "RelativeToolTip": "Kafka\\KafkaConsumerService.cs",
-              "ViewState": "AgIAAC4AAAAAAAAAAAAowDQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-15T11:57:41.506Z",
+              "WhenOpened": "2025-12-01T19:02:08.72Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "20251201190048_initial_migration.cs",
+              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Migrations\\20251201190048_initial_migration.cs",
+              "RelativeDocumentMoniker": "Migrations\\20251201190048_initial_migration.cs",
+              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Migrations\\20251201190048_initial_migration.cs",
+              "RelativeToolTip": "Migrations\\20251201190048_initial_migration.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAqwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-01T19:00:48.578Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WriteDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Context\\WriteDbContext.cs",
+              "RelativeDocumentMoniker": "Context\\WriteDbContext.cs",
+              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Context\\WriteDbContext.cs",
+              "RelativeToolTip": "Context\\WriteDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvxcAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-01T18:56:00.069Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "OutboxUpdate.cs",
+              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxTest\\OutboxUpdate.cs",
+              "RelativeDocumentMoniker": "Outbox\\OutboxTest\\OutboxUpdate.cs",
+              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxTest\\OutboxUpdate.cs",
+              "RelativeToolTip": "Outbox\\OutboxTest\\OutboxUpdate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-01T13:37:03.921Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "OutboxMessage.cs",
+              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxMessage.cs",
+              "RelativeDocumentMoniker": "Outbox\\OutboxMessage.cs",
+              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxMessage.cs",
+              "RelativeToolTip": "Outbox\\OutboxMessage.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-01T13:12:24.262Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ServiceCollectionExtension.cs",
+              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Extensions\\ServiceCollectionExtension.cs",
+              "RelativeDocumentMoniker": "Extensions\\ServiceCollectionExtension.cs",
+              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Extensions\\ServiceCollectionExtension.cs",
+              "RelativeToolTip": "Extensions\\ServiceCollectionExtension.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAkwDsAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-01T12:55:07.136Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "OutboxProcessorService.cs",
               "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxProcessorService.cs",
               "RelativeDocumentMoniker": "Outbox\\OutboxProcessorService.cs",
               "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxProcessorService.cs",
               "RelativeToolTip": "Outbox\\OutboxProcessorService.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAwwBoAAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAywCEAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-07T21:53:50.154Z",
+              "WhenOpened": "2025-12-01T12:55:00.946Z",
               "EditorCaption": ""
-            }
-          ]
-        },
-        {
-          "DockedWidth": 528,
-          "SelectedChildIndex": 1,
-          "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ReadDbContext.cs",
-              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Context\\ReadDbContext.cs",
-              "RelativeDocumentMoniker": "Context\\ReadDbContext.cs",
-              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Context\\ReadDbContext.cs",
-              "RelativeToolTip": "Context\\ReadDbContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-15T07:53:47.627Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "KafkaProducerService.cs",
-              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Kafka\\KafkaProducerService.cs",
-              "RelativeDocumentMoniker": "Kafka\\KafkaProducerService.cs",
-              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Kafka\\KafkaProducerService.cs",
-              "RelativeToolTip": "Kafka\\KafkaProducerService.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAuwAsAAAAlAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "OutboxBackgroundService.cs",
+              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxTest\\OutboxBackgroundService.cs",
+              "RelativeDocumentMoniker": "Outbox\\OutboxTest\\OutboxBackgroundService.cs",
+              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxTest\\OutboxBackgroundService.cs",
+              "RelativeToolTip": "Outbox\\OutboxTest\\OutboxBackgroundService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-08T10:45:15.502Z",
+              "WhenOpened": "2025-12-01T12:53:51.883Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "OutboxProcessor.cs",
+              "DocumentMoniker": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxTest\\OutboxProcessor.cs",
+              "RelativeDocumentMoniker": "Outbox\\OutboxTest\\OutboxProcessor.cs",
+              "ToolTip": "C:\\Users\\danut\\Projects\\Multi-Factor-Authentication\\MFAWebApplication\\Outbox\\OutboxTest\\OutboxProcessor.cs",
+              "RelativeToolTip": "Outbox\\OutboxTest\\OutboxProcessor.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-30T12:50:02.86Z",
               "EditorCaption": ""
             }
           ]
