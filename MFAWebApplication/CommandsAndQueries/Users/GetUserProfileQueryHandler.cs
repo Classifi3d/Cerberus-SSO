@@ -1,33 +1,35 @@
-﻿using AuthenticationWebApplication.Enteties;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
-using MFAWebApplication.Abstraction.UnitOfWork;
-using MFAWebApplication.Context;
+using MFAWebApplication.Abstraction.Repository;
+using MFAWebApplication.Entities;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
-
-public sealed record GetUserProfileQuery( Guid UserId ) : IQuery<User>;
+public sealed record GetUserProfileQuery(Guid UserId) : IQuery<UserReadModel>;
 
 internal sealed class GetUserProfileQueryHandler
-    : IQueryHandler<GetUserProfileQuery, User>
+    : IQueryHandler<GetUserProfileQuery, UserReadModel>
 {
-    private readonly UnitOfWork<WriteDbContext> _unitOfWork;
+    private readonly IReadModelRepository<UserReadModel> _userRepository;
 
-
-    public GetUserProfileQueryHandler(UnitOfWork<WriteDbContext> unitOfWork )
+    public GetUserProfileQueryHandler(IReadModelRepository<UserReadModel> userRepository)
     {
-        _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
     }
 
-    public async Task<Result<User>> Handle(
+    public async Task<Result<UserReadModel>> Handle(
         GetUserProfileQuery request,
-        CancellationToken cancellationToken )
+        CancellationToken cancellationToken)
     {
-        var user = await _unitOfWork.Repository<User>().GetByIdAsync(request.UserId, cancellationToken);
+        //var user = await _userRepository.GetByPropertyAsync(
+        //    u => u.Id,
+        //    request.UserId.ToString(),
+        //    cancellationToken);
 
-        if ( user is null )
-            return Result.Failure<User>("User not found");
+        var user = await _userRepository.GetByIdAsync(request.UserId);
+
+        if (user is null)
+            return Result.Failure<UserReadModel>("User not found");
 
 
         return Result.Success(user);

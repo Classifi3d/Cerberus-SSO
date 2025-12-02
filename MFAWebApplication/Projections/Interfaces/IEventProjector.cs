@@ -1,4 +1,4 @@
-﻿namespace MFAWebApplication.Projections;
+﻿namespace MFAWebApplication.Projections.Interfaces;
 public interface IEventProjector
 {
     string EventType { get; }

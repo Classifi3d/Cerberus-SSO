@@ -1,5 +1,5 @@
 ﻿using Confluent.Kafka;
-using MFAWebApplication.Projections;
+using MFAWebApplication.Projections.Interfaces;
 using System.Text;
 
 namespace MFAWebApplication.Kafka;

@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace MFAWebApplication.Enteties;
+namespace MFAWebApplication.Entities;
 
 public class ReadModel
 {

@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using MessagePack;
 using MFAWebApplication.Abstraction.Repository;
-using MFAWebApplication.Enteties;
+using MFAWebApplication.Entities;
+using MFAWebApplication.Projections.Interfaces;
 
 namespace MFAWebApplication.Projections;
 public class UserCreatedProjector : IEventProjector

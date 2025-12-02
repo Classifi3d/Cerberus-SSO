@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace MFAWebApplication.Enteties;
+namespace MFAWebApplication.Entities;
 
 public class UserReadModel : ReadModel
 {
@@ -15,5 +15,4 @@ public class UserReadModel : ReadModel
     public string Password { get; set; } = string.Empty;
     [BsonElement("isMfaEnabled")]
     public bool IsMfaEnabled { get; set; }
-
 }

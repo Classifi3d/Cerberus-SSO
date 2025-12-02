@@ -1,4 +1,4 @@
-﻿using MFAWebApplication.Enteties;
+﻿using MFAWebApplication.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

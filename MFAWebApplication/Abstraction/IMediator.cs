@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 
+#pragma warning disable VSTHRD200 
+
 namespace MFAWebApplication.Abstraction;
 
 public interface IMediator

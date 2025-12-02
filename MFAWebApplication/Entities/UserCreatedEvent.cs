@@ -1,4 +1,4 @@
-﻿namespace MFAWebApplication.Enteties;
+﻿namespace MFAWebApplication.Entities;
 public class UserCreatedEvent
 {
     public Guid Id { get; set; }

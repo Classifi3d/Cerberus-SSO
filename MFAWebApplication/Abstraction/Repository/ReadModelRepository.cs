@@ -1,10 +1,11 @@
 ﻿using MFAWebApplication.Context;
-using MFAWebApplication.Enteties;
+using MFAWebApplication.Entities;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System.Linq.Expressions;
 
 namespace MFAWebApplication.Abstraction.Repository;
+
 public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where TEntity : ReadModel
 {
     private readonly IMongoCollection<TEntity> _collection;
@@ -14,12 +15,19 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
         _collection = readDbContext.GetCollection<TEntity>(typeof(TEntity).Name);
     }
 
-    public IQueryable<TEntity> GetAll() => _collection.AsQueryable();
+    public async Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _collection
+            .Find(FilterDefinition<TEntity>.Empty)
+            .ToListAsync(cancellationToken);
+    }
 
     public async Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<TEntity>.Filter.Eq("_id", id);
-        return await _collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        var filter = Builders<TEntity>.Filter.Eq("_id", id.ToString());
+        return await _collection
+            .Find(filter)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<TEntity?> GetByPropertyAsync<TProperty>(
@@ -27,16 +35,73 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
         TProperty value,
         CancellationToken cancellationToken = default)
     {
-        var parameter = propertySelector.Parameters[0];
-        var body = Expression.Equal(propertySelector.Body, Expression.Constant(value, typeof(TProperty)));
-        var lambda = Expression.Lambda<Func<TEntity, bool>>(body, parameter);
+        var member = (propertySelector.Body as MemberExpression)!;
+        var fieldName = member.Member.Name;
 
-        return await _collection.AsQueryable().FirstOrDefaultAsync(lambda, cancellationToken);
+        var filter = Builders<TEntity>.Filter.Eq(fieldName, value);
+        return await _collection
+            .Find(filter)
+            .FirstOrDefaultAsync(cancellationToken);
     }
+
+    //public async Task<bool> UpsertIfNewerConcurrencyAsync(
+    //TEntity entity,
+    //CancellationToken cancellationToken = default)
+    //{
+    //    var id = GetEntityId(entity);
+
+    //    // optimistic concurrency: update only if concurrencyIndex matches
+    //    var filter = Builders<TEntity>.Filter.And(
+    //        Builders<TEntity>.Filter.Eq("_id", id),
+    //        Builders<TEntity>.Filter.Eq("concurrencyIndex", entity.ConcurrencyIndex)
+    //    );
+
+    //    // build field updates
+    //    var updates = new List<UpdateDefinition<TEntity>>();
+
+    //    foreach (var prop in typeof(TEntity).GetProperties())
+    //    {
+    //        var name = prop.Name;
+    //        if (name.Equals("Id", StringComparison.OrdinalIgnoreCase) ||
+    //            name.Equals("_id", StringComparison.OrdinalIgnoreCase))
+    //            continue;
+
+    //        var value = prop.GetValue(entity);
+    //        updates.Add(Builders<TEntity>.Update.Set(name, value));
+    //    }
+
+    //    // increment concurrency index
+    //    updates.Add(
+    //        Builders<TEntity>.Update.Inc("concurrencyIndex", 1)
+    //    );
+
+    //    // ensure ID on insert
+    //    updates.Add(
+    //        Builders<TEntity>.Update.SetOnInsert("_id", id)
+    //    );
+
+    //    var updateDefinition = Builders<TEntity>.Update.Combine(updates);
+
+    //    var options = new UpdateOptions { IsUpsert = true };
+
+    //    var result = await _collection.UpdateOneAsync(
+    //        filter,
+    //        updateDefinition,
+    //        options,
+    //        cancellationToken
+    //    );
+
+    //    // result.ModifiedCount > 0 means updated
+    //    // result.UpsertedId != null means inserted
+    //    return result.IsAcknowledged &&
+    //           (result.ModifiedCount > 0 || result.UpsertedId != null);
+    //}
+
 
     public async Task<bool> UpsertIfNewerConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        try {
+        try
+        {
             var id = GetEntityId(entity);
             var filter = Builders<TEntity>.Filter.And(
                 Builders<TEntity>.Filter.Eq("_id", id),
@@ -73,11 +138,11 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
                 return false;
             }
         }
-        catch 
+        catch
         {
-            return false; 
+            return false;
         }
-        
+
     }
 
     public async Task<bool> DeleteIfMatchingConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default)

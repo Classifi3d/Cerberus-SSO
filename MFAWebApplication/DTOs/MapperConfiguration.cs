@@ -1,7 +1,7 @@
 ﻿using AuthenticationWebApplication.DTOs;
 using AuthenticationWebApplication.Enteties;
 using AutoMapper;
-using MFAWebApplication.Enteties;
+using MFAWebApplication.Entities;
 
 namespace MFAWebApplication.DTOs;
 

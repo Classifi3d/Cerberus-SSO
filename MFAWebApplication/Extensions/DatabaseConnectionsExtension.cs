@@ -1,12 +1,11 @@
-﻿using MFAWebApplication.Abstraction.UnitOfWork;
-using MFAWebApplication.Context;
+﻿using MFAWebApplication.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace MFAWebApplication.Extensions;
 
-public static class ExternalConnectionsExtensions
+public static class DatabaseConnectionsExtension
 {
-    public static IHostApplicationBuilder AddExternalServices(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddDatabaseConnections(this IHostApplicationBuilder builder)
     {
         // Write Database PostgreSQL
         builder.Services.AddDbContext<WriteDbContext>(

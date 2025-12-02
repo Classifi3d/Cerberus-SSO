@@ -5,13 +5,13 @@ using MFAWebApplication.Abstraction.Repository;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
 using MFAWebApplication.DTOs;
-using MFAWebApplication.Enteties;
+using MFAWebApplication.Entities;
 using MFAWebApplication.Kafka;
 using MFAWebApplication.Outbox;
 using MFAWebApplication.Projections;
 using MFAWebApplication.Services;
 using System.Reflection;
-using static CSharpFunctionalExtensions.Result;
+
 namespace MFAWebApplication.Extensions;
 
 public static class ServiceCollectionExtension
@@ -23,7 +23,6 @@ public static class ServiceCollectionExtension
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
         services.AddScoped<UnitOfWork<WriteDbContext>>();
-        //services.AddScoped<UnitOfWork<ReadDbContext>>();
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped(typeof(IReadModelRepository<>), typeof(ReadModelRepository<>));

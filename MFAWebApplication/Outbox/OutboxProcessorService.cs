@@ -11,7 +11,7 @@ namespace MFAWebApplication.Outbox;
 public class OutboxProcessorService : BackgroundService
 {
     private const int OUTBOX_PROCESSOR_FREQUENCY = 3;
-    private const int BATCH_SIZE = 100;
+    private const int BATCH_SIZE = 1000;
     private const int PRODUCE_CONCURRENCY = 64;
 
     private readonly IServiceProvider _serviceProvider;

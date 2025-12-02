@@ -5,7 +5,7 @@ using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
-using MFAWebApplication.Enteties;
+using MFAWebApplication.Entities;
 using MFAWebApplication.Services;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;

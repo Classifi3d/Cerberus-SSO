@@ -20,7 +20,8 @@ internal sealed class DeleteUserCommandHandler
 
     public async Task<Result> Handle( DeleteUserCommand request, CancellationToken cancellationToken )
     {
-        var isDeleted = true; //await _userRepository.DeleteUserAsync(request.UserId, cancellationToken);
+        var isDeleted = true; 
+        //await _userRepository.DeleteUserAsync(request.UserId, cancellationToken);
 
         return isDeleted
             ? Result.Success()

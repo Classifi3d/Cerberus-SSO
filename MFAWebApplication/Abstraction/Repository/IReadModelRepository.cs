@@ -11,7 +11,7 @@ public interface IReadModelRepository<TEntity>
         TProperty value,
         CancellationToken cancellationToken = default);
 
-    IQueryable<TEntity> GetAll();
+    Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Delets only if the incoming ConcurrencyIndex is equal to the stored one.
@@ -25,6 +25,4 @@ public interface IReadModelRepository<TEntity>
     /// Returns true if an insert or update occurred.
     /// </summary>
     Task<bool> UpsertIfNewerConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default);
-
-
 }

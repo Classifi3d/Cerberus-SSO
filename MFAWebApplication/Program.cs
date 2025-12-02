@@ -29,7 +29,7 @@ builder
     });
 
 // Middleware Endpoint Rate Limiting
-//builder.Services.AddCustomRateLimiters();
+builder.Services.AddCustomRateLimiters();
 
 // JWT Token
 builder
@@ -71,7 +71,7 @@ builder
 
 
 // Databases
-builder.AddExternalServices();
+builder.AddDatabaseConnections();
 
 // Depedency Injections
 builder.Services.AddApplicationServices();
