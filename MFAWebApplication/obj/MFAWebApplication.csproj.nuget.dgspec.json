@@ -54,6 +54,10 @@
               "target": "Package",
               "version": "[13.0.1, )"
             },
+            "BouncyCastle.Cryptography": {
+              "target": "Package",
+              "version": "[2.6.2, )"
+            },
             "CSharpFunctionalExtensions": {
               "target": "Package",
               "version": "[3.6.0, )"

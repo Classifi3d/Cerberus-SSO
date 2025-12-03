@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Security;
 
 namespace MFAWebApplication.Services;
 
@@ -12,12 +13,13 @@ public class SecurityService : ISecurityService
 
     private readonly IConfiguration _configuration;
 
-    public SecurityService( IConfiguration configuration )
+    public SecurityService(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
-    public string CreateToken( Guid userId ){
+    public string CreateToken(Guid userId)
+    {
         List<Claim> claims = new List<Claim>(){
             new Claim(ClaimTypes.NameIdentifier,userId.ToString())
         };
@@ -33,11 +35,26 @@ public class SecurityService : ISecurityService
         return jwt;
     }
 
-    public string PasswordHashing( string inputString )
+    // Old Implementation SHA256 implementation
+    private string PasswordHashing(string inputString)
     {
         var inputBytes = Encoding.UTF8.GetBytes(inputString);
         var inputHash = SHA256.HashData(inputBytes);
         return Convert.ToHexString(inputHash);
     }
 
+    public string HashPassword(string plainPassword)
+    {
+        int costFactor = 12;
+
+        byte[] salt = new byte[16];
+
+        new SecureRandom().NextBytes(salt);
+        return OpenBsdBCrypt.Generate(plainPassword.ToCharArray(), salt, costFactor);
+    }
+
+    public bool CheckPassword(string plainPassword, string hashPassword)
+    {
+        return OpenBsdBCrypt.CheckPassword(hashPassword, plainPassword.ToCharArray());
+    }
 }

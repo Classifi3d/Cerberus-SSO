@@ -5,7 +5,6 @@ using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
-using MFAWebApplication.DTOs;
 using MFAWebApplication.Entities;
 using MFAWebApplication.Services;
 
@@ -46,7 +45,7 @@ internal sealed class UpdateUserCommandHandler
         user.Username = request.User.Username;
         if(userDto.Password is not null)
         {
-            user.Password = _securityService.PasswordHashing(userDto.Password);
+            user.Password = _securityService.HashPassword(userDto.Password);
         }
         user.UpdateDate = DateTime.UtcNow;
 

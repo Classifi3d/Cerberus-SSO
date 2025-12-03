@@ -20,8 +20,6 @@ public static class ServiceCollectionExtension
     {
 
         // Infrastructure
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
         services.AddScoped<UnitOfWork<WriteDbContext>>();
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -47,7 +45,7 @@ public static class ServiceCollectionExtension
 
         // Services
         services.AddScoped<ISecurityService, SecurityService>();
-        services.AddAutoMapper(assemblies);
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.AddSingleton(MapperConfiguration.InitializeAutomapper());
         services.AddMemoryCache();
 

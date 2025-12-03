@@ -38,8 +38,8 @@ internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Logi
             return Result.Failure<LoginSecurityDTO>("Invalid credentials");
         }
 
-        var hashedPassword = _securityService.PasswordHashing(loginDto.Password);
-        if (hashedPassword != user.Password)
+        var isPasswordMatching = _securityService.CheckPassword(loginDto.Password,user.Password);
+        if (isPasswordMatching)
         {
             return Result.Failure<LoginSecurityDTO>("Invalid credentials");
         }

@@ -453,3 +453,4 @@ C:\Users\danut\Projects\Multi-Factor-Authentication\MFAWebApplication\bin\Debug\
 C:\Users\danut\Projects\Multi-Factor-Authentication\MFAWebApplication\bin\Debug\net8.0\zh-Hans\Microsoft.VisualStudio.Validation.resources.dll
 C:\Users\danut\Projects\Multi-Factor-Authentication\MFAWebApplication\bin\Debug\net8.0\zh-Hant\Microsoft.VisualStudio.Validation.resources.dll
 C:\Users\danut\Projects\Multi-Factor-Authentication\MFAWebApplication\obj\Debug\net8.0\swae.build.ex.cache
+C:\Users\danut\Projects\Multi-Factor-Authentication\MFAWebApplication\bin\Debug\net8.0\BouncyCastle.Cryptography.dll

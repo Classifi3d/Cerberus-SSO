@@ -37,7 +37,7 @@ internal sealed class CreateUserCommandHandler : ICommandHandler<CreateUserComma
 
         }
         user.Id = Guid.NewGuid();
-        user.Password = _securityService.PasswordHashing(request.userDto.Password);
+        user.Password = _securityService.HashPassword(request.userDto.Password);
         user.CreateDate = DateTime.UtcNow;
         user.UpdateDate = DateTime.UtcNow;
 
