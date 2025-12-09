@@ -6,12 +6,12 @@ namespace MFAWebApplication.Abstraction.Repository;
 public class Repository<TEntity> : IRepository<TEntity>
     where TEntity : class
 {
-    protected readonly DbContext _context;
+    protected readonly DbContext _dbContext;
     protected readonly DbSet<TEntity> _dbSet;
 
     public Repository( DbContext context )
     {
-        _context = context;
+        _dbContext = context;
         _dbSet = context.Set<TEntity>();
     }
 

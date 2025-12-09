@@ -1,4 +1,4 @@
-﻿using MFAWebApplication.Enteties;
+﻿using MFAWebApplication.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -23,5 +23,5 @@ public class User : BaseEntity
     public string? MfaSecretKey { get; set; }
     public bool IsMfaEnabled { get; set; } = false;
     [ConcurrencyCheck]
-    public long ConcurencyIndex { get; set; } = 0;
+    public ulong ConcurrencyIndex { get; set; } = 1;
 }

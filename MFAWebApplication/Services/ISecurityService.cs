@@ -2,6 +2,7 @@
 
 public interface ISecurityService
 {
-    public string CreateToken( Guid userId );
-    public string PasswordHashing( string inputString );
+    public string CreateToken(Guid userId);
+    public string HashPassword(string plainPassword);
+    public bool CheckPassword(string plainPassword, string hashPassword);
 }

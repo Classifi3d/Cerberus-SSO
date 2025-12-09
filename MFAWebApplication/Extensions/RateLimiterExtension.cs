@@ -10,13 +10,27 @@ public static class RateLimiterExtension
         services.AddRateLimiter(options =>
         {
             // Registration limiter
-            options.AddFixedWindowLimiter("registerLimiter", opt =>
-            {
-                opt.PermitLimit = 5; // Max 5 registrations per minute
-                opt.Window = TimeSpan.FromMinutes(1);
-                opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                opt.QueueLimit = 2; // Allows 2 extra attempts to queue
-            });
+            //services.AddRateLimiter(options =>
+            //{
+            //    options.AddPolicy("registerLimiter", httpContext =>
+            //        RateLimitPartition.GetFixedWindowLimiter(
+            //            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown_ip",
+            //            factory: key => new FixedWindowRateLimiterOptions
+            //            {
+            //                PermitLimit = 5,
+            //                Window = TimeSpan.FromMinutes(1),
+            //                QueueLimit = 2,
+            //                QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+            //            }));
+            //});
+
+            //options.AddFixedWindowLimiter("registerLimiter", opt =>
+            //{
+            //    opt.PermitLimit = 5; // Max 5 registrations per minute
+            //    opt.Window = TimeSpan.FromMinutes(1);
+            //    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            //    opt.QueueLimit = 2; // Allows 2 extra attempts to queue
+            //});
 
             // Login limiter
             options.AddTokenBucketLimiter("loginLimiter", opt =>

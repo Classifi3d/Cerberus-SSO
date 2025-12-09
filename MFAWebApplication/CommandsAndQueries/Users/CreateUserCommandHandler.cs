@@ -5,54 +5,48 @@ using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
-using MFAWebApplication.Enteties;
-using MFAWebApplication.Kafka;
+using MFAWebApplication.Entities;
 using MFAWebApplication.Services;
-using System.Text.Json;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
-
-public sealed record CreateUserCommand( UserDTO userDto ) : ICommand;
+public sealed record CreateUserCommand(UserDTO userDto) : ICommand;
 
 internal sealed class CreateUserCommandHandler : ICommandHandler<CreateUserCommand>
 {
     private readonly UnitOfWork<WriteDbContext> _unitOfWork;
-    private readonly KafkaProducerService _kafka;
     private readonly ISecurityService _securityService;
     private readonly Mapper _mapper;
 
     public CreateUserCommandHandler(
-        UnitOfWork<WriteDbContext> unitOfWork, 
-        KafkaProducerService kafka, 
-        Mapper mapper, 
-        ISecurityService securityService )
+        UnitOfWork<WriteDbContext> unitOfWork,
+        Mapper mapper,
+        ISecurityService securityService)
     {
         _unitOfWork = unitOfWork;
-        _kafka = kafka;
         _securityService = securityService;
         _mapper = mapper;
     }
 
-    public async Task<Result> Handle( CreateUserCommand request, CancellationToken cancellationToken )
+    public async Task<Result> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var user = _mapper.Map<User>(request.userDto);
-        if ( user is null )
+        if (user is null)
         {
             return Result.Failure("Creating user failed");
 
         }
         user.Id = Guid.NewGuid();
-        user.Password = _securityService.PasswordHashing(request.userDto.Password);
+        user.Password = _securityService.HashPassword(request.userDto.Password);
         user.CreateDate = DateTime.UtcNow;
         user.UpdateDate = DateTime.UtcNow;
 
         await _unitOfWork.Repository<User>().AddAsync(user);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var userEvent = _mapper.Map<UserCreatedEvent>(user);
-        var message = JsonSerializer.Serialize(userEvent);
-        await _kafka.ProduceAsync(message);
+        var userEvent = _mapper.Map<UserUpsertEvent>(user);
+        _unitOfWork.AddOutboxEvent(userEvent);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

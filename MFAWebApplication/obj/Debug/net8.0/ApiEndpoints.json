@@ -37,7 +37,7 @@
   },
   {
     "ContainingType": "AuthenticationWebApplication.Controllers.UserController",
-    "Method": "AddUserAsync",
+    "Method": "CreateUserAsync",
     "RelativePath": "User/sign-up",
     "HttpMethod": "POST",
     "IsController": true,
@@ -54,7 +54,7 @@
   {
     "ContainingType": "AuthenticationWebApplication.Controllers.UserController",
     "Method": "UpdateUserAsync",
-    "RelativePath": "User/user",
+    "RelativePath": "User/update",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,

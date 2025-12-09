@@ -15,13 +15,13 @@ public sealed record VerifyMfaOfUserQuery( MfaVerificationDTO verificationDto ) 
 
 internal sealed class VerifyMfaOfUserQueryHandler : IQueryHandler<VerifyMfaOfUserQuery, string>
 {
-    private readonly UnitOfWork<ReadDbContext> _unitOfWork;
+    private readonly UnitOfWork<WriteDbContext> _unitOfWork;
 
     private readonly ISecurityService _securityService;
     private readonly IMemoryCache _cache;
 
     public VerifyMfaOfUserQueryHandler(
-        UnitOfWork<ReadDbContext> unitOfWork,
+        UnitOfWork<WriteDbContext> unitOfWork,
         ISecurityService securityService,
         IMemoryCache cache
         )
@@ -54,7 +54,8 @@ internal sealed class VerifyMfaOfUserQueryHandler : IQueryHandler<VerifyMfaOfUse
         var totp = new Totp(secretKeyBytes, step: 30);
         // Generate expected OTP for the current time
         var expectedOtp = totp.ComputeTotp();
-        Console.WriteLine($"Expected OTP: {expectedOtp}");
+        //Console.WriteLine($"Expected OTP: {expectedOtp}");
+        
         bool isValid = totp.VerifyTotp(verification.Code, out _, VerificationWindow.RfcSpecifiedNetworkDelay);
 
 

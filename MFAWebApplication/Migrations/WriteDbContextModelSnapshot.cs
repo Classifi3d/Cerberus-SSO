@@ -28,9 +28,9 @@ namespace MFAWebApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<long>("ConcurencyIndex")
+                    b.Property<decimal>("ConcurrencyIndex")
                         .IsConcurrencyToken()
-                        .HasColumnType("bigint");
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
@@ -65,6 +65,39 @@ namespace MFAWebApplication.Migrations
                         .IsUnique();
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("MFAWebApplication.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte[]>("Payload")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProcessedAt")
+                        .HasDatabaseName("IX_Outbox_Processed_At")
+                        .HasFilter("\"ProcessedAt\" IS NOT NULL");
+
+                    b.HasIndex("ProcessedAt", "CreatedAt")
+                        .HasDatabaseName("IX_Outbox_Pending")
+                        .HasFilter("\"ProcessedAt\" IS NULL");
+
+                    b.ToTable("OutboxMessages");
                 });
 #pragma warning restore 612, 618
         }

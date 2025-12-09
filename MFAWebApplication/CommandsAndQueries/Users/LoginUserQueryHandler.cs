@@ -1,55 +1,53 @@
 ﻿using AuthenticationWebApplication.DTOs;
-using AuthenticationWebApplication.Enteties;
 using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
-using MFAWebApplication.Abstraction.UnitOfWork;
-using MFAWebApplication.Context;
+using MFAWebApplication.Abstraction.Repository;
 using MFAWebApplication.DTOs;
+using MFAWebApplication.Entities;
 using MFAWebApplication.Services;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
-public sealed record LoginUserQuery( UserLoginDTO userLoginDto ) : IQuery<LoginSecurityDTO>;
+public sealed record LoginUserQuery(UserLoginDTO userLoginDto) : IQuery<LoginSecurityDTO>;
 
 internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, LoginSecurityDTO>
 {
-    private readonly UnitOfWork<ReadDbContext> _unitOfWork;
+    private readonly IReadModelRepository<UserReadModel> _userRepository;
     private readonly ISecurityService _securityService;
     private readonly IMemoryCache _cache;
 
     public LoginUserQueryHandler(
-        UnitOfWork<ReadDbContext> unitOfWork,
+        IReadModelRepository<UserReadModel> userRepository,
         ISecurityService securityService,
-        IMemoryCache cache )
-
+        IMemoryCache cache)
     {
-        _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
         _securityService = securityService;
         _cache = cache;
     }
 
-    public async Task<Result<LoginSecurityDTO>> Handle( LoginUserQuery request, CancellationToken cancellationToken )
+    public async Task<Result<LoginSecurityDTO>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
     {
         var loginDto = request.userLoginDto;
         var userEmail = loginDto.Email;
 
-        var user = await _unitOfWork.Repository<User>().GetByPropertyAsync(u => u.Email,userEmail, cancellationToken);
-        if ( user == null )
+        var user = await _userRepository.GetByPropertyAsync(u => u.Email, userEmail, cancellationToken);
+        if (user == null)
         {
             return Result.Failure<LoginSecurityDTO>("Invalid credentials");
         }
 
-
-        var hashedPassword = _securityService.PasswordHashing(loginDto.Password);
-        if ( hashedPassword != user.Password )
+        var isPasswordMatching = _securityService.CheckPassword(loginDto.Password,user.Password);
+        if (isPasswordMatching)
         {
             return Result.Failure<LoginSecurityDTO>("Invalid credentials");
         }
 
-        if ( !user.IsMfaEnabled )
+        if (!user.IsMfaEnabled)
         {
-            var token = _securityService.CreateToken(user.Id);
+            Guid.TryParse(user.Id, out Guid id);
+            var token = _securityService.CreateToken(id);
             var result = new LoginSecurityDTO
             {
                 Token = token,

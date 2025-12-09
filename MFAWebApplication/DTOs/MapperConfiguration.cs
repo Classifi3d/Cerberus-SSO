@@ -1,7 +1,7 @@
 ﻿using AuthenticationWebApplication.DTOs;
 using AuthenticationWebApplication.Enteties;
 using AutoMapper;
-using MFAWebApplication.Enteties;
+using MFAWebApplication.Entities;
 
 namespace MFAWebApplication.DTOs;
 
@@ -12,8 +12,10 @@ public class MapperConfiguration
         var config = new AutoMapper.MapperConfiguration(cfg =>
         {
             cfg.CreateMap<User, UserDTO>().ReverseMap();
-            cfg.CreateMap<User, UserCreatedEvent>().ReverseMap();
-            cfg.CreateMap<UserCreatedEvent, UserReadModel>().ReverseMap();
+            cfg.CreateMap<User, UserUpsertEvent>().ReverseMap();
+            cfg.CreateMap<UserUpsertEvent, UserReadModel>()
+                .ForMember(dest => dest.Id, 
+                            opt => opt.MapFrom(src => src.Id.ToString()));
         }
         );
 

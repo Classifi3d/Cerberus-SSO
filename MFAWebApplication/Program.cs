@@ -1,7 +1,7 @@
 using MFAWebApplication.Configurations;
 using MFAWebApplication.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
@@ -69,13 +69,24 @@ builder
         );
     });
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 
 // Databases
-builder.AddExternalServices();
+builder.AddDatabaseConnections();
 
 // Depedency Injections
 builder.Services.AddApplicationServices();
 
+// Exceptions
+builder.Services.AddExceptionHandlers();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -85,10 +96,16 @@ if ( app.Environment.IsDevelopment() )
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseForwardedHeaders();
 
-app.UseRateLimiter();
+//app.UseRateLimiter();
+app.UseExceptionHandler();
 app.UseCors(allowSpecificOrigin);
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+//app.MapGet("/test-ip", (HttpContext context) =>
+//{
+//    return context.Connection.RemoteIpAddress?.ToString() ?? "no ip";
+//});
 app.Run();

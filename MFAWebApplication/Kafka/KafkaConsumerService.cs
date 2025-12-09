@@ -1,76 +1,149 @@
-﻿using AuthenticationWebApplication.Enteties;
-using AutoMapper;
-using Confluent.Kafka;
-using MFAWebApplication.Abstraction.UnitOfWork;
-using MFAWebApplication.Context;
-using MFAWebApplication.Enteties;
-using System.Text.Json;
+﻿using Confluent.Kafka;
+using MFAWebApplication.Projections.Interfaces;
+using System.Text;
+
+namespace MFAWebApplication.Kafka;
 
 public class KafkaConsumerService : BackgroundService
 {
+    private readonly IHostApplicationLifetime _appLifetime;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IConsumer<Null, string> _consumer;
     private readonly string _topic;
-    private readonly Mapper _mapper;
+    private readonly IConsumer<Null, byte[]> _consumer;
+    private readonly IDictionary<string, Type> _projectorTypes;
+    private bool _appStarted = false;
+    private readonly ILogger<KafkaConsumerService> _logger;
 
-    public KafkaConsumerService(IServiceProvider serviceProvider, IConfiguration config, Mapper mapper)
+    private const int CONSUMER_PROCESS_FREQUENCY = 3;
+    private const int BATCH_SIZE = 1000;
+
+    public KafkaConsumerService(
+        IHostApplicationLifetime appLifetime,
+        IServiceProvider serviceProvider,
+        IConfiguration config,
+        IDictionary<string, Type> projectorTypes,
+        ILogger<KafkaConsumerService> logger)
     {
+        _appLifetime = appLifetime;
         _serviceProvider = serviceProvider;
-        _mapper = mapper;
-
         var consumerConfig = new ConsumerConfig
         {
             BootstrapServers = config["Kafka:BootstrapServers"],
             GroupId = "read-db-consumer",
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnableAutoCommit = true,
-            StatisticsIntervalMs = 5000,
-            FetchWaitMaxMs = 5,        // ↓ reduces fetch latency
-            FetchMinBytes = 1,         // deliver small messages immediately
-            SessionTimeoutMs = 10000
+            EnableAutoCommit = false,
+            // Fetch settings
+            FetchWaitMaxMs = 50,                   // Wait max 50ms for data
+            FetchMinBytes = 1,                     // Immediately deliver messages
+            MaxPartitionFetchBytes = 4 * 1024 * 1024, // 4 MB per partition
+            // Queueing / batching
+            QueuedMinMessages = 1000,              // Minimum buffered
+            QueuedMaxMessagesKbytes = 51200,       // 50 MB local queue
+            // Heartbeat / session
+            SessionTimeoutMs = 10000,
+            MaxPollIntervalMs = 300000,
         };
-
-        _consumer = new ConsumerBuilder<Null, string>(consumerConfig).Build();
         _topic = config["Kafka:Topic"];
+
+        _consumer = new ConsumerBuilder<Null, byte[]>(consumerConfig).Build();
+        _projectorTypes = projectorTypes;
+        _logger = logger;
+
+        _appLifetime.ApplicationStarted.Register(() =>
+        {
+            _appStarted = true;
+        });
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await Task.Yield();
+        _logger.LogInformation("KafkaConsumerService started. Listening to topic: {topic}", _topic);
+
+        _consumer.Subscribe(_topic);
+
+        while (!_appStarted && !stoppingToken.IsCancellationRequested)
+        {
+            await Task.Delay(1000, stoppingToken);
+        }
+
+        int processedSinceCommit = 0;
+        var lastCommitTime = DateTime.UtcNow;
+
         try
         {
-            _consumer.Subscribe(_topic);
-
             while (!stoppingToken.IsCancellationRequested)
             {
+                ConsumeResult<Null, byte[]> result;
+
                 try
                 {
-                    var result = _consumer.Consume(stoppingToken);
-                    var userEvent = JsonSerializer.Deserialize<UserCreatedEvent>(result.Message.Value);
-
-                    if (userEvent != null)
-                    {
-                        using var scope = _serviceProvider.CreateScope();
-                        var uow = scope.ServiceProvider.GetRequiredService<UnitOfWork<ReadDbContext>>();
-                        var repo = uow.Repository<UserReadModel>();
-
-                        var existingUser = await repo.GetByIdAsync(userEvent.Id, stoppingToken);
-                        if (existingUser == null)
-                        {
-                            var userReadModel = _mapper.Map<UserReadModel>(userEvent);
-                            await repo.AddAsync(userReadModel, stoppingToken);
-                            await uow.SaveChangesAsync(stoppingToken);
-                        }
-                    }
+                    result = _consumer.Consume(stoppingToken);
                 }
                 catch (OperationCanceledException)
                 {
                     break;
                 }
+
+                if (result?.Message?.Value == null)
+                    continue;
+
+                string? type = null;
+                var headers = result.Message.Headers;
+                if (headers != null)
+                {
+                    var typeHeader = headers.GetLastBytes("type");
+                    if (typeHeader != null)
+                    {
+                        type = Encoding.UTF8.GetString(typeHeader);
+                    }
+                }
+
+                if (string.IsNullOrEmpty(type))
+                {
+                    _consumer.Commit(result);
+                    continue;
+                }
+
+                if (!_projectorTypes.TryGetValue(type, out var projType))
+                {
+                    _consumer.Commit(result);
+                    continue;
+                }
+                if (stoppingToken.IsCancellationRequested)
+                    Console.WriteLine("WARNING: host requested shutdown during processing");
+
+                using var scope = _serviceProvider.CreateScope();
+                var projector = (IEventProjector)scope.ServiceProvider.GetRequiredService(projType);
+
+                var payload = result.Message.Value;
+                await projector.ProjectAsync(payload, CancellationToken.None);
+
+                processedSinceCommit++;
+                if ((processedSinceCommit >= BATCH_SIZE) ||
+                    (DateTime.UtcNow - lastCommitTime) >= TimeSpan.FromSeconds(CONSUMER_PROCESS_FREQUENCY))
+                {
+                    try
+                    {
+                        _consumer.Commit();
+                        lastCommitTime = DateTime.UtcNow;
+                        processedSinceCommit = 0;
+                        _logger.LogInformation("Batch of size {BatchSize} committed", BATCH_SIZE);
+                    }
+                    catch (KafkaException e)
+                    {
+                        _logger.LogError(e, "Error committing Kafka batch");
+                    }
+                }
             }
         }
         finally
         {
+            try
+            {
+                _consumer.Commit();
+            }
+            catch { }
             _consumer.Close();
         }
     }
