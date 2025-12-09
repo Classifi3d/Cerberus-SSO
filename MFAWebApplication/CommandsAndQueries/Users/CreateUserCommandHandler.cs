@@ -43,7 +43,7 @@ internal sealed class CreateUserCommandHandler : ICommandHandler<CreateUserComma
 
         await _unitOfWork.Repository<User>().AddAsync(user);
 
-        var userEvent = _mapper.Map<UserCreatedEvent>(user);
+        var userEvent = _mapper.Map<UserUpsertEvent>(user);
         _unitOfWork.AddOutboxEvent(userEvent);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

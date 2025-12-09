@@ -1,5 +1,5 @@
 ﻿namespace MFAWebApplication.Entities;
-public class UserCreatedEvent
+public class UserUpsertEvent
 {
     public Guid Id { get; set; }
     public string Email { get; set; } = string.Empty;

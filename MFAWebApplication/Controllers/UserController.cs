@@ -14,7 +14,7 @@ namespace AuthenticationWebApplication.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
+    //[Authorize]
     public class UserController : Controller
     {
 
@@ -131,7 +131,6 @@ namespace AuthenticationWebApplication.Controllers
             return Ok(new { token = loginResult.Token });
         }
 
-        [AllowAnonymous] // comment
         [HttpPut]
         [Route("update")]
         public async Task<IActionResult> UpdateUserAsync([FromBody] UserDTO userDto, CancellationToken cancellationToken)

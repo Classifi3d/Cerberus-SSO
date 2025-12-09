@@ -63,10 +63,10 @@ public static class ServiceCollectionExtension
 
         // Receiver 
         services.AddHostedService<KafkaConsumerService>();
-        services.AddScoped<UserCreatedProjector>();
+        services.AddScoped<UserUpsertProjector>();
         var projectorMap = new Dictionary<string, Type>
         {
-            [nameof(UserCreatedEvent)] = typeof(UserCreatedProjector),
+            [nameof(UserUpsertEvent)] = typeof(UserUpsertProjector),
             // [OrderCreatedEvent)] = typeof(OrderCreatedProjector)
         };
         services.AddSingleton<IDictionary<string, Type>>(projectorMap);

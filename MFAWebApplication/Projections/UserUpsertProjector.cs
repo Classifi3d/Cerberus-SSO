@@ -5,22 +5,22 @@ using MFAWebApplication.Entities;
 using MFAWebApplication.Projections.Interfaces;
 
 namespace MFAWebApplication.Projections;
-public class UserCreatedProjector : IEventProjector
+public class UserUpsertProjector : IEventProjector
 {
-    public string EventType => nameof(UserCreatedEvent);
 
-    private readonly IReadModelRepository<UserReadModel> _repo;
+    private readonly IReadModelRepository<UserReadModel> _repository;
     private readonly IMapper _mapper;
 
-    public UserCreatedProjector(IReadModelRepository<UserReadModel> repo, IMapper mapper)
+    public UserUpsertProjector(IReadModelRepository<UserReadModel> repository, IMapper mapper)
     {
-        _repo = repo;
+        _repository = repository;
         _mapper = mapper;
     }
+    public string EventType => nameof(UserUpsertEvent);
 
     public async Task ProjectAsync(byte[] payload, CancellationToken cancellationToken)
     {
-        var userEvent = MessagePackSerializer.Deserialize<UserCreatedEvent>(payload);
+        var userEvent = MessagePackSerializer.Deserialize<UserUpsertEvent>(payload);
         if (userEvent == null) return;
 
         var readModel = new UserReadModel
@@ -34,6 +34,6 @@ public class UserCreatedProjector : IEventProjector
         };
         //readModel = _mapper.Map<UserReadModel>(userEvent);
 
-        await _repo.UpsertIfNewerConcurrencyAsync(readModel, cancellationToken);
+        await _repository.UpsertIfNewerConcurrencyAsync(readModel, cancellationToken);
     }
 }

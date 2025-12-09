@@ -54,7 +54,8 @@ internal sealed class VerifyMfaOfUserQueryHandler : IQueryHandler<VerifyMfaOfUse
         var totp = new Totp(secretKeyBytes, step: 30);
         // Generate expected OTP for the current time
         var expectedOtp = totp.ComputeTotp();
-        Console.WriteLine($"Expected OTP: {expectedOtp}");
+        //Console.WriteLine($"Expected OTP: {expectedOtp}");
+        
         bool isValid = totp.VerifyTotp(verification.Code, out _, VerificationWindow.RfcSpecifiedNetworkDelay);
 
 

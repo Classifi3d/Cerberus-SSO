@@ -14,7 +14,6 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
     {
         _collection = readDbContext.GetCollection<TEntity>(typeof(TEntity).Name);
     }
-
     public async Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _collection
@@ -43,61 +42,6 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
             .Find(filter)
             .FirstOrDefaultAsync(cancellationToken);
     }
-
-    //public async Task<bool> UpsertIfNewerConcurrencyAsync(
-    //TEntity entity,
-    //CancellationToken cancellationToken = default)
-    //{
-    //    var id = GetEntityId(entity);
-
-    //    // optimistic concurrency: update only if concurrencyIndex matches
-    //    var filter = Builders<TEntity>.Filter.And(
-    //        Builders<TEntity>.Filter.Eq("_id", id),
-    //        Builders<TEntity>.Filter.Eq("concurrencyIndex", entity.ConcurrencyIndex)
-    //    );
-
-    //    // build field updates
-    //    var updates = new List<UpdateDefinition<TEntity>>();
-
-    //    foreach (var prop in typeof(TEntity).GetProperties())
-    //    {
-    //        var name = prop.Name;
-    //        if (name.Equals("Id", StringComparison.OrdinalIgnoreCase) ||
-    //            name.Equals("_id", StringComparison.OrdinalIgnoreCase))
-    //            continue;
-
-    //        var value = prop.GetValue(entity);
-    //        updates.Add(Builders<TEntity>.Update.Set(name, value));
-    //    }
-
-    //    // increment concurrency index
-    //    updates.Add(
-    //        Builders<TEntity>.Update.Inc("concurrencyIndex", 1)
-    //    );
-
-    //    // ensure ID on insert
-    //    updates.Add(
-    //        Builders<TEntity>.Update.SetOnInsert("_id", id)
-    //    );
-
-    //    var updateDefinition = Builders<TEntity>.Update.Combine(updates);
-
-    //    var options = new UpdateOptions { IsUpsert = true };
-
-    //    var result = await _collection.UpdateOneAsync(
-    //        filter,
-    //        updateDefinition,
-    //        options,
-    //        cancellationToken
-    //    );
-
-    //    // result.ModifiedCount > 0 means updated
-    //    // result.UpsertedId != null means inserted
-    //    return result.IsAcknowledged &&
-    //           (result.ModifiedCount > 0 || result.UpsertedId != null);
-    //}
-
-
     public async Task<bool> UpsertIfNewerConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         try

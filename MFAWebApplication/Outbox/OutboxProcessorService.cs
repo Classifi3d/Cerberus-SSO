@@ -1,5 +1,4 @@
 ﻿
-using Confluent.Kafka;
 using MFAWebApplication.Context;
 using MFAWebApplication.Kafka;
 using Microsoft.EntityFrameworkCore;
@@ -17,11 +16,16 @@ public class OutboxProcessorService : BackgroundService
     private readonly IServiceProvider _serviceProvider;
     private readonly KafkaProducerService _kafka;
     private readonly AsyncAutoResetEvent _signal = new(false);
+    private readonly ILogger<OutboxProcessorService> _logger;
 
-    public OutboxProcessorService(IServiceProvider serviceProvider, KafkaProducerService kafka)
+    public OutboxProcessorService(
+        IServiceProvider serviceProvider, 
+        KafkaProducerService kafka,
+        ILogger<OutboxProcessorService> logger)
     {
         _serviceProvider = serviceProvider;
         _kafka = kafka;
+        _logger = logger;
     }
 
     public void NotifyNewOutboxMessage()
@@ -73,7 +77,7 @@ public class OutboxProcessorService : BackgroundService
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Produce failed for Outbox {msg.Id}: {e.Message}");
+                    _logger.LogError($"Produce failed for Outbox {msg.Id}: {e.Message}");
                 }
             }
             finally

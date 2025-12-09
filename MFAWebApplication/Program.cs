@@ -1,5 +1,4 @@
 using MFAWebApplication.Configurations;
-using MFAWebApplication.Exceptions.ExceptionHandlers;
 using MFAWebApplication.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -99,14 +98,14 @@ if ( app.Environment.IsDevelopment() )
 }
 app.UseForwardedHeaders();
 
-app.UseRateLimiter();
+//app.UseRateLimiter();
 app.UseExceptionHandler();
 app.UseCors(allowSpecificOrigin);
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-app.MapGet("/test-ip", (HttpContext context) =>
-{
-    return context.Connection.RemoteIpAddress?.ToString() ?? "no ip";
-});
+//app.MapGet("/test-ip", (HttpContext context) =>
+//{
+//    return context.Connection.RemoteIpAddress?.ToString() ?? "no ip";
+//});
 app.Run();

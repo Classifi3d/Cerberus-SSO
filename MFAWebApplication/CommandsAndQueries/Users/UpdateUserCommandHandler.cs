@@ -51,7 +51,7 @@ internal sealed class UpdateUserCommandHandler
 
         _unitOfWork.Repository<User>().Update(user);
 
-        var userEvent = _mapper.Map<UserCreatedEvent>(user);
+        var userEvent = _mapper.Map<UserUpsertEvent>(user);
         _unitOfWork.AddOutboxEvent(userEvent);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

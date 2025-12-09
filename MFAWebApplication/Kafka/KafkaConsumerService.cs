@@ -12,6 +12,7 @@ public class KafkaConsumerService : BackgroundService
     private readonly IConsumer<Null, byte[]> _consumer;
     private readonly IDictionary<string, Type> _projectorTypes;
     private bool _appStarted = false;
+    private readonly ILogger<KafkaConsumerService> _logger;
 
     private const int CONSUMER_PROCESS_FREQUENCY = 3;
     private const int BATCH_SIZE = 1000;
@@ -20,7 +21,8 @@ public class KafkaConsumerService : BackgroundService
         IHostApplicationLifetime appLifetime,
         IServiceProvider serviceProvider,
         IConfiguration config,
-        IDictionary<string, Type> projectorTypes)
+        IDictionary<string, Type> projectorTypes,
+        ILogger<KafkaConsumerService> logger)
     {
         _appLifetime = appLifetime;
         _serviceProvider = serviceProvider;
@@ -45,16 +47,19 @@ public class KafkaConsumerService : BackgroundService
 
         _consumer = new ConsumerBuilder<Null, byte[]>(consumerConfig).Build();
         _projectorTypes = projectorTypes;
+        _logger = logger;
 
         _appLifetime.ApplicationStarted.Register(() =>
         {
             _appStarted = true;
         });
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        Console.WriteLine($"KafkaConsumerService started. Listening to topic: {_topic}");
+        _logger.LogInformation("KafkaConsumerService started. Listening to topic: {topic}", _topic);
+
         _consumer.Subscribe(_topic);
 
         while (!_appStarted && !stoppingToken.IsCancellationRequested)
@@ -123,11 +128,11 @@ public class KafkaConsumerService : BackgroundService
                         _consumer.Commit();
                         lastCommitTime = DateTime.UtcNow;
                         processedSinceCommit = 0;
-                        Console.WriteLine($"Batch of size {BATCH_SIZE} commited");
+                        _logger.LogInformation("Batch of size {BatchSize} committed", BATCH_SIZE);
                     }
                     catch (KafkaException e)
                     {
-                        Console.WriteLine($"Batch commited error: {e}");
+                        _logger.LogError(e, "Error committing Kafka batch");
                     }
                 }
             }

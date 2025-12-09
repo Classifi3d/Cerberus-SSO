@@ -3,8 +3,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Security;
+//using Org.BouncyCastle.Crypto.Generators;
+//using Org.BouncyCastle.Security;
 
 namespace MFAWebApplication.Services;
 
@@ -36,25 +36,29 @@ public class SecurityService : ISecurityService
     }
 
     // Old Implementation SHA256 implementation
-    private string PasswordHashing(string inputString)
+    public string HashPassword(string inputString)
     {
         var inputBytes = Encoding.UTF8.GetBytes(inputString);
         var inputHash = SHA256.HashData(inputBytes);
         return Convert.ToHexString(inputHash);
     }
 
-    public string HashPassword(string plainPassword)
-    {
-        int costFactor = 12;
-
-        byte[] salt = new byte[16];
-
-        new SecureRandom().NextBytes(salt);
-        return OpenBsdBCrypt.Generate(plainPassword.ToCharArray(), salt, costFactor);
-    }
-
     public bool CheckPassword(string plainPassword, string hashPassword)
     {
-        return OpenBsdBCrypt.CheckPassword(hashPassword, plainPassword.ToCharArray());
+        var inputBytes = Encoding.UTF8.GetBytes(plainPassword);
+        var inputHash = SHA256.HashData(inputBytes);
+        string hashed =  Convert.ToHexString(inputHash);
+        return hashPassword.Equals(hashed);
     }
+
+    //public string HashPassword(string plainPassword)
+    //{
+    //    int costFactor = 12;
+    //    return BCrypt.Net.BCrypt.HashPassword(plainPassword, costFactor);
+    //}
+
+    //public bool CheckPassword(string plainPassword, string hashPassword)
+    //{
+    //    return BCrypt.Net.BCrypt.Verify(plainPassword, hashPassword);
+    //}
 }
