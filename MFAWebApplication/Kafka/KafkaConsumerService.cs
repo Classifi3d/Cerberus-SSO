@@ -111,7 +111,7 @@ public class KafkaConsumerService : BackgroundService
                     continue;
                 }
                 if (stoppingToken.IsCancellationRequested)
-                    Console.WriteLine("WARNING: host requested shutdown during processing");
+                    _logger.LogCritical("WARNING: host requested shutdown during processing");
 
                 using var scope = _serviceProvider.CreateScope();
                 var projector = (IEventProjector)scope.ServiceProvider.GetRequiredService(projType);
@@ -128,11 +128,11 @@ public class KafkaConsumerService : BackgroundService
                         _consumer.Commit();
                         lastCommitTime = DateTime.UtcNow;
                         processedSinceCommit = 0;
-                        _logger.LogInformation("Batch of size {BatchSize} committed", BATCH_SIZE);
+                        _logger.LogInformation("Batch of size {BatchSize} processed", BATCH_SIZE);
                     }
                     catch (KafkaException e)
                     {
-                        _logger.LogError(e, "Error committing Kafka batch");
+                        _logger.LogError(e, "Error processing Kafka batch");
                     }
                 }
             }

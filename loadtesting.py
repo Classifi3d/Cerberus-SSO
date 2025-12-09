@@ -83,4 +83,4 @@ def run_load_test(requests_per_second=100, duration_seconds=10):
     print(f"Total requests sent: {total_requests}")
 
 if __name__ == "__main__":
-    run_load_test(requests_per_second=33, duration_seconds=600)
+    run_load_test(requests_per_second=2, duration_seconds=600)

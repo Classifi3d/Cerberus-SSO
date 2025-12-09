@@ -19,7 +19,7 @@ public class OutboxProcessorService : BackgroundService
     private readonly ILogger<OutboxProcessorService> _logger;
 
     public OutboxProcessorService(
-        IServiceProvider serviceProvider, 
+        IServiceProvider serviceProvider,
         KafkaProducerService kafka,
         ILogger<OutboxProcessorService> logger)
     {
@@ -36,6 +36,10 @@ public class OutboxProcessorService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(OUTBOX_PROCESSOR_FREQUENCY));
+
+        _logger.LogInformation("Outbox processor started with frequency " +
+            "{FrequencySeconds}s", OUTBOX_PROCESSOR_FREQUENCY);
+
         while (await timer.WaitForNextTickAsync(cancellationToken))
         {
             await ProcessPendingMessagesAsync(cancellationToken);
@@ -47,20 +51,32 @@ public class OutboxProcessorService : BackgroundService
         using var scope = _serviceProvider.CreateScope();
         var database = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
 
-        var outboxMessages = await database.OutboxMessages
-        .FromSqlRaw(
-            $"""
-            SELECT *
-            FROM "OutboxMessages"
-            WHERE "ProcessedAt" IS NULL
-            ORDER BY "CreatedAt"
-            LIMIT {BATCH_SIZE}
-            FOR UPDATE SKIP LOCKED
-            """)
-        .ToListAsync(cancellationToken);
+        List<OutboxMessage> outboxMessages;
+        try
+        {
+            outboxMessages = await database.OutboxMessages
+            .FromSqlRaw(
+                $"""
+                SELECT *
+                FROM "OutboxMessages"
+                WHERE "ProcessedAt" IS NULL
+                ORDER BY "CreatedAt"
+                LIMIT {BATCH_SIZE}
+                FOR UPDATE SKIP LOCKED
+                """)
+            .ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed querying outbox messages");
+            return;
+        }
 
-
-        if (outboxMessages.Count == 0) return;
+        if (outboxMessages.Count == 0)
+        {
+            _logger.LogDebug("No pending outbox messages found");
+            return;
+        }
 
         var successIds = new ConcurrentBag<Guid>();
         var sem = new SemaphoreSlim(PRODUCE_CONCURRENCY);
@@ -74,6 +90,8 @@ public class OutboxProcessorService : BackgroundService
                 {
                     await _kafka.ProduceAsync(msg);
                     successIds.Add(msg.Id);
+                    _logger.LogInformation("Outbox message {MessageId} " +
+                        "successfully produced to Kafka", msg.Id);
                 }
                 catch (Exception e)
                 {
@@ -91,10 +109,20 @@ public class OutboxProcessorService : BackgroundService
         var producedList = successIds.Distinct().ToList();
         if (producedList.Count > 0)
         {
-            await database.OutboxMessages
+            try
+            {
+                await database.OutboxMessages
                 .Where(m => producedList.Contains(m.Id))
                 .ExecuteUpdateAsync(setters =>
                     setters.SetProperty(m => m.ProcessedAt, DateTime.UtcNow), cancellationToken);
+
+                _logger.LogInformation("Marked {Count} outbox messages as processed",producedList.Count);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed updating ProcessedAt for " +
+                    "{Count} outbox messages", producedList.Count);
+            }
         }
     }
 }

@@ -3,6 +3,9 @@
 .bin/
 **/.bin/
 
+*.dll
+*.exe
+
 # User-specific files
 *.suo
 *.user
@@ -113,9 +116,3 @@ UpgradeLog*.htm
 **/App_Data/*.mdf
 **/App_Data/*.ldf
 **/App_Data/*.sdf
-
-
-#LightSwitch generated files
-GeneratedArtifacts/
-_Pvt_Extensions/
-ModelManifest.xml
