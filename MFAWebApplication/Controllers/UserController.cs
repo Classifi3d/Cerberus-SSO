@@ -1,5 +1,4 @@
 ﻿using AuthenticationWebApplication.DTOs;
-using AuthenticationWebApplication.Enteties;
 using MFAWebApplication.Abstraction;
 using MFAWebApplication.CommandsAndQueries.Users;
 using MFAWebApplication.DTOs;
@@ -25,19 +24,7 @@ namespace AuthenticationWebApplication.Controllers
             _mediator = mediator;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetUsersAsync()
-        //{
-        //    var users = await _userRepository.GetAll();
-        //    if (users != null)
-        //    {
-        //        return Ok(users);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
+
 
         // // ==== TEST ====
         //[AllowAnonymous]
@@ -61,7 +48,7 @@ namespace AuthenticationWebApplication.Controllers
         [HttpGet]
         [Route("user-data")]
         [ActionName("GetUserById")]
-        public async Task<IActionResult> GetUserData(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetUserDataAsync(CancellationToken cancellationToken)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 

@@ -36,29 +36,29 @@ public class SecurityService : ISecurityService
     }
 
     // Old Implementation SHA256 implementation
-    public string HashPassword(string inputString)
-    {
-        var inputBytes = Encoding.UTF8.GetBytes(inputString);
-        var inputHash = SHA256.HashData(inputBytes);
-        return Convert.ToHexString(inputHash);
-    }
-
-    public bool CheckPassword(string plainPassword, string hashPassword)
-    {
-        var inputBytes = Encoding.UTF8.GetBytes(plainPassword);
-        var inputHash = SHA256.HashData(inputBytes);
-        string hashed =  Convert.ToHexString(inputHash);
-        return hashPassword.Equals(hashed);
-    }
-
-    //public string HashPassword(string plainPassword)
+    //public string HashPassword(string inputString)
     //{
-    //    int costFactor = 12;
-    //    return BCrypt.Net.BCrypt.HashPassword(plainPassword, costFactor);
+    //    var inputBytes = Encoding.UTF8.GetBytes(inputString);
+    //    var inputHash = SHA256.HashData(inputBytes);
+    //    return Convert.ToHexString(inputHash);
     //}
 
     //public bool CheckPassword(string plainPassword, string hashPassword)
     //{
-    //    return BCrypt.Net.BCrypt.Verify(plainPassword, hashPassword);
+    //    var inputBytes = Encoding.UTF8.GetBytes(plainPassword);
+    //    var inputHash = SHA256.HashData(inputBytes);
+    //    string hashed =  Convert.ToHexString(inputHash);
+    //    return hashPassword.Equals(hashed);
     //}
+
+    public string HashPassword(string plainPassword)
+    {
+        int costFactor = 12;
+        return BCrypt.Net.BCrypt.HashPassword(plainPassword, costFactor);
+    }
+
+    public bool CheckPassword(string plainPassword, string hashPassword)
+    {
+        return BCrypt.Net.BCrypt.Verify(plainPassword, hashPassword);
+    }
 }

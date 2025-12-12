@@ -41,7 +41,6 @@ public class KafkaProducerService
         kafkaMessage.Headers.Add("type", Encoding.UTF8.GetBytes(message.Type));
         kafkaMessage.Headers.Add("outbox-id", Encoding.UTF8.GetBytes(message.Id.ToString()));
 
-
         await _producer.ProduceAsync(_topic, kafkaMessage);
     }
 }

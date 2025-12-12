@@ -34,6 +34,6 @@ public class UserUpsertProjector : IEventProjector
         };
         //readModel = _mapper.Map<UserReadModel>(userEvent);
 
-        await _repository.UpsertIfNewerConcurrencyAsync(readModel, cancellationToken);
+        await _repository.UpsertIfMatchingConcurrencyAsync(readModel, cancellationToken);
     }
 }

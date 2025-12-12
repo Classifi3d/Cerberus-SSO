@@ -1,5 +1,7 @@
 ﻿using MFAWebApplication.Context;
+using MFAWebApplication.Services;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace MFAWebApplication.Extensions;
 
@@ -23,10 +25,19 @@ public static class DatabaseConnectionsExtension
         //        )
         //);
 
-
         // Read Database MongoDB
         builder.Services.AddSingleton<ReadDbContext>();
 
+        // Redis Cache Database 
+        builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var configuration = ConfigurationOptions.Parse(
+                builder.Configuration.GetConnectionString("Redis"));
+            configuration.AbortOnConnectFail = false;
+
+            return ConnectionMultiplexer.Connect(configuration);
+        });
+        builder.Services.AddScoped<ICacheService, CacheService>();
 
         return builder;
     }

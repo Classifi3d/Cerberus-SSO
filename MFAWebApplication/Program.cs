@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.Elasticsearch;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Text;
@@ -15,24 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
-    {
-        AutoRegisterTemplate = true,
-        IndexFormat = "mfawebapplication-development-{0:yyyy-MM}",
-        NumberOfShards = 1,
-        NumberOfReplicas = 1,
-        TypeName = null
-    })
-    .CreateLogger();
 
-builder.Host.UseSerilog();
-
+builder.Host.UseSerilog(LoggerConfigurator.ConfigureLogger(builder.Configuration));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

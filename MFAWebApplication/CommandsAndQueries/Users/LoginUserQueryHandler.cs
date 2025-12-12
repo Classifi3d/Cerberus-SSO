@@ -15,16 +15,16 @@ internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Logi
 {
     private readonly IReadModelRepository<UserReadModel> _userRepository;
     private readonly ISecurityService _securityService;
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
 
     public LoginUserQueryHandler(
         IReadModelRepository<UserReadModel> userRepository,
         ISecurityService securityService,
-        IMemoryCache cache)
+        ICacheService cacheService)
     {
         _userRepository = userRepository;
         _securityService = securityService;
-        _cache = cache;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<LoginSecurityDTO>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
@@ -39,7 +39,7 @@ internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Logi
         }
 
         var isPasswordMatching = _securityService.CheckPassword(loginDto.Password,user.Password);
-        if (isPasswordMatching)
+        if (!isPasswordMatching)
         {
             return Result.Failure<LoginSecurityDTO>("Invalid credentials");
         }
@@ -59,7 +59,7 @@ internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Logi
         }
 
         var challengeId = Guid.NewGuid().ToString();
-        _cache.Set($"mfa_challenge_{challengeId}", user.Id, TimeSpan.FromMinutes(5));
+        _cacheService.SetAsync($"mfa_challenge_{challengeId}", user.Id, TimeSpan.FromMinutes(5));
 
         var mfaResult = new LoginSecurityDTO
         {

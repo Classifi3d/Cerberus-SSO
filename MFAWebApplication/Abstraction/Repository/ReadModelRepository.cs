@@ -42,7 +42,15 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
             .Find(filter)
             .FirstOrDefaultAsync(cancellationToken);
     }
-    public async Task<bool> UpsertIfNewerConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default)
+    private static object? GetEntityId(TEntity entity)
+    {
+        var prop = typeof(TEntity).GetProperty("Id");
+        return prop?.GetValue(entity);
+    }
+
+    public async Task<bool> UpsertIfMatchingConcurrencyAsync(
+        TEntity entity,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -89,7 +97,9 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
 
     }
 
-    public async Task<bool> DeleteIfMatchingConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteIfMatchingConcurrencyAsync(
+        TEntity entity,
+        CancellationToken cancellationToken = default)
     {
         var id = GetEntityId(entity);
 
@@ -103,11 +113,6 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
         return result.DeletedCount > 0;
     }
 
-    private static object? GetEntityId(TEntity entity)
-    {
-        var prop = typeof(TEntity).GetProperty("Id");
-        return prop?.GetValue(entity);
-    }
 
 }
 

@@ -11,7 +11,7 @@ public class OutboxProcessorService : BackgroundService
 {
     private const int OUTBOX_PROCESSOR_FREQUENCY = 3;
     private const int BATCH_SIZE = 1000;
-    private const int PRODUCE_CONCURRENCY = 64;
+    private const int THREAD_COUNT = 4;
 
     private readonly IServiceProvider _serviceProvider;
     private readonly KafkaProducerService _kafka;
@@ -51,6 +51,7 @@ public class OutboxProcessorService : BackgroundService
         using var scope = _serviceProvider.CreateScope();
         var database = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
 
+        // Select pending outbox messages
         List<OutboxMessage> outboxMessages;
         try
         {
@@ -74,13 +75,13 @@ public class OutboxProcessorService : BackgroundService
 
         if (outboxMessages.Count == 0)
         {
-            _logger.LogDebug("No pending outbox messages found");
+            _logger.LogInformation("No pending outbox messages found");
             return;
         }
 
+        // Publish concurrently
         var successIds = new ConcurrentBag<Guid>();
-        var sem = new SemaphoreSlim(PRODUCE_CONCURRENCY);
-
+        var sem = new SemaphoreSlim(THREAD_COUNT);
         var produceTasks = outboxMessages.Select(async msg =>
         {
             await sem.WaitAsync(cancellationToken);
@@ -90,7 +91,7 @@ public class OutboxProcessorService : BackgroundService
                 {
                     await _kafka.ProduceAsync(msg);
                     successIds.Add(msg.Id);
-                    _logger.LogInformation("Outbox message {MessageId} " +
+                    _logger.LogDebug("Outbox message {MessageId} " +
                         "successfully produced to Kafka", msg.Id);
                 }
                 catch (Exception e)
@@ -106,17 +107,18 @@ public class OutboxProcessorService : BackgroundService
 
         await Task.WhenAll(produceTasks);
 
+        // Apply updates
         var producedList = successIds.Distinct().ToList();
         if (producedList.Count > 0)
         {
             try
             {
                 await database.OutboxMessages
-                .Where(m => producedList.Contains(m.Id))
-                .ExecuteUpdateAsync(setters =>
-                    setters.SetProperty(m => m.ProcessedAt, DateTime.UtcNow), cancellationToken);
+                    .Where(m => producedList.Contains(m.Id))
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(m => m.ProcessedAt, DateTime.UtcNow), cancellationToken);
 
-                _logger.LogInformation("Marked {Count} outbox messages as processed",producedList.Count);
+                _logger.LogInformation("Marked {Count} outbox messages as processed", producedList.Count);
             }
             catch (Exception e)
             {
