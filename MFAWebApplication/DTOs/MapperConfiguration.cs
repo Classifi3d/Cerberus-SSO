@@ -13,6 +13,7 @@ public class MapperConfiguration
             {
                 cfg.CreateMap<User, UserDTO>().ReverseMap();
                 cfg.CreateMap<User, UserUpsertEvent>().ReverseMap();
+                cfg.CreateMap<User, UserDeletedEvent>().ReverseMap();
                 cfg.CreateMap<UserUpsertEvent, UserReadModel>()
                     .ForMember(
                         dest => dest.Id,

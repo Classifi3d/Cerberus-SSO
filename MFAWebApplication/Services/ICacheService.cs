@@ -6,4 +6,5 @@ public interface ICacheService
     Task SetAsync<T>(string key, T value, TimeSpan? expiry = null);
     Task<bool> RemoveAsync(string key);
     Task<bool> KeyExistsAsync(string key);
+    bool TryGetValue<T>(string key, out T value);
 }

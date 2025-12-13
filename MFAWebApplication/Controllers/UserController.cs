@@ -132,7 +132,7 @@ namespace AuthenticationWebApplication.Controllers
         }
 
         [HttpDelete]
-        [Route("user/{userId:guid}")]
+        [Route("{userId:guid}")]
         public async Task<IActionResult> DeleteUserAsync(Guid userId, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new DeleteUserCommand(userId), cancellationToken);

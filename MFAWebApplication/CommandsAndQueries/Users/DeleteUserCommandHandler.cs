@@ -1,8 +1,10 @@
 ﻿using AuthenticationWebApplication.Enteties;
+using AutoMapper;
 using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
+using MFAWebApplication.Entities;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
@@ -13,10 +15,14 @@ internal sealed class DeleteUserCommandHandler
     : ICommandHandler<DeleteUserCommand>
 {
     private readonly UnitOfWork<WriteDbContext> _unitOfWork;
+    private readonly Mapper _mapper;
 
-    public DeleteUserCommandHandler(UnitOfWork<WriteDbContext> unitOfWork)
+    public DeleteUserCommandHandler(
+        UnitOfWork<WriteDbContext> unitOfWork,
+        Mapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
     public async Task<Result> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
@@ -29,7 +35,9 @@ internal sealed class DeleteUserCommandHandler
         }
 
         _unitOfWork.Repository<User>().Delete(user);
-        _unitOfWork.AddOutboxEvent(user);
+
+        var userEvent = _mapper.Map<UserDeletedEvent>(user);
+        _unitOfWork.AddOutboxEvent(userEvent);
 
         await _unitOfWork.SaveChangesAsync();
 

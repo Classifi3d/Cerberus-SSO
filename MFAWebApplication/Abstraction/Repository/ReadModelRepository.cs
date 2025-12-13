@@ -105,7 +105,7 @@ public class ReadModelRepository<TEntity> : IReadModelRepository<TEntity> where 
 
         var filter = Builders<TEntity>.Filter.And(
             Builders<TEntity>.Filter.Eq("_id", id),
-            Builders<TEntity>.Filter.Lt("concurrencyIndex", entity.ConcurrencyIndex)
+            Builders<TEntity>.Filter.Lte("concurrencyIndex", entity.ConcurrencyIndex)
         );
 
 

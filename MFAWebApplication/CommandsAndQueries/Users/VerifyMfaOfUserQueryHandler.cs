@@ -11,66 +11,53 @@ using OtpNet;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
-public sealed record VerifyMfaOfUserQuery( MfaVerificationDTO verificationDto ) : IQuery<string>;
+public sealed record VerifyMfaOfUserQuery(MfaVerificationDTO verificationDto) : IQuery<string>;
 
 internal sealed class VerifyMfaOfUserQueryHandler : IQueryHandler<VerifyMfaOfUserQuery, string>
 {
     private readonly UnitOfWork<WriteDbContext> _unitOfWork;
 
     private readonly ISecurityService _securityService;
-    private readonly IMemoryCache _cache;
+    private readonly ICacheService _cacheService;
 
     public VerifyMfaOfUserQueryHandler(
         UnitOfWork<WriteDbContext> unitOfWork,
         ISecurityService securityService,
-        IMemoryCache cache
+        ICacheService cacheService
         )
     {
         _unitOfWork = unitOfWork;
-
         _securityService = securityService;
-        _cache = cache;
+        _cacheService = cacheService;
     }
 
-    public async Task<Result<string>> Handle( VerifyMfaOfUserQuery request, CancellationToken cancellationToken )
+    public async Task<Result<string>> Handle(VerifyMfaOfUserQuery request, CancellationToken cancellationToken)
     {
 
         var verification = request.verificationDto;
 
-        if ( !_cache.TryGetValue($"mfa_challenge_{verification.ChallengeId}", out Guid userId) )
+        if (!_cacheService.TryGetValue($"mfa_challenge_{verification.ChallengeId}", out Guid userId))
         {
             return Result.Failure<string>("Challenge token expired or invalid");
         }
 
         var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId, cancellationToken);
 
-        if ( user is null )
+        if (user is null)
             return Result.Failure<string>("User not found");
 
-        // Decode Base32 secret key
-        byte[] secretKeyBytes = Google.Authenticator.Base32Encoding.ToBytes(user.MfaSecretKey);
 
-        // Create TOTP instance with a 30-second time step (Google Authenticator standard)
-        var totp = new Totp(secretKeyBytes, step: 30);
-        // Generate expected OTP for the current time
-        var expectedOtp = totp.ComputeTotp();
-        //Console.WriteLine($"Expected OTP: {expectedOtp}");
-        
-        bool isValid = totp.VerifyTotp(verification.Code, out _, VerificationWindow.RfcSpecifiedNetworkDelay);
+        bool isTotpValid = _securityService.CheckTotp(user.MfaSecretKey, verification.Code);
 
+        var token = _securityService.CreateJSONWebToken(user.Id);
 
-        var token = _securityService.CreateToken(user.Id);
-
-        if ( token is null || !isValid )
+        if (token is null || !isTotpValid)
         {
             return Result.Failure<string>("Invalid MFA code");
         }
 
-        // Remove challenge after successful verification
-        _cache.Remove($"mfa_challenge_{verification.ChallengeId}");
+        await _cacheService.RemoveAsync($"mfa_challenge_{verification.ChallengeId}");
 
         return Result.Success(token);
-
-    }
-
+    } 
 }

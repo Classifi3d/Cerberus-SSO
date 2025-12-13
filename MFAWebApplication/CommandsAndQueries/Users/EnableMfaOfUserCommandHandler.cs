@@ -40,27 +40,16 @@ internal sealed class EnableMfaOfUserCommandHandler : ICommandHandler<EnableMfaO
         if ( !string.IsNullOrEmpty(user.MfaSecretKey) )
             return Result.Failure<byte[]>("MFA already enabled for this user");
 
-        // Generate Base32-encoded secret key
-        var key = KeyGeneration.GenerateRandomKey(20);
-        var secretKey = Base32Encoding.ToString(key);
 
-        // OTP URL
-        string issuer = Uri.EscapeDataString("MFA-Security");
-        string accountName = Uri.EscapeDataString(user.Email);
-        string otpauthUrl = $"otpauth://totp/{issuer}:{accountName}?secret={secretKey}&issuer={issuer}&digits=6";
-
-        // Generate QR code as PNG bytes
-        using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(otpauthUrl, QRCodeGenerator.ECCLevel.Q);
-        using var qrCode = new PngByteQRCode(qrCodeData);
-        var qrBytes = qrCode.GetGraphic(20);
+        var encodedMfaKey = _securityService.GenerateEncodedMfaKey();
+        var qrBytes = _securityService.GenerateQRCode(encodedMfaKey, user.Email);
 
         if(qrBytes is null )
         {
             return Result.Failure<byte[]>("QR Code cannot be generated");
         }
 
-        user.MfaSecretKey = secretKey;
+        user.MfaSecretKey = encodedMfaKey;
         user.IsMfaEnabled = true;
 
         _unitOfWork.Repository<User>().Update(user);

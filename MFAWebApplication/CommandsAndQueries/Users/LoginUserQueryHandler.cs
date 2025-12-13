@@ -5,7 +5,6 @@ using MFAWebApplication.Abstraction.Repository;
 using MFAWebApplication.DTOs;
 using MFAWebApplication.Entities;
 using MFAWebApplication.Services;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
@@ -47,7 +46,7 @@ internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Logi
         if (!user.IsMfaEnabled)
         {
             Guid.TryParse(user.Id, out Guid id);
-            var token = _securityService.CreateToken(id);
+            var token = _securityService.CreateJSONWebToken(id);
             var result = new LoginSecurityDTO
             {
                 Token = token,
@@ -59,7 +58,7 @@ internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Logi
         }
 
         var challengeId = Guid.NewGuid().ToString();
-        _cacheService.SetAsync($"mfa_challenge_{challengeId}", user.Id, TimeSpan.FromMinutes(5));
+        await _cacheService.SetAsync($"mfa_challenge_{challengeId}", user.Id, TimeSpan.FromMinutes(5));
 
         var mfaResult = new LoginSecurityDTO
         {
