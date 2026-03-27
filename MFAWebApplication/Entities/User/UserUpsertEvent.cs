@@ -1,4 +1,4 @@
-﻿namespace MFAWebApplication.Entities;
+﻿namespace MFAWebApplication.Entities.User;
 public class UserUpsertEvent
 {
     public Guid Id { get; set; }

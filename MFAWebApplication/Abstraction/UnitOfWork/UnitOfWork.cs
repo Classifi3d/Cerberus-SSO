@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MFAWebApplication.Abstraction.UnitOfWork;
 
-public class UnitOfWork<TContext> : IUnitOfWork, IDisposable
+public sealed class UnitOfWork<TContext> : IUnitOfWork, IDisposable
     where TContext : DbContext
 {
     private readonly TContext _dbContext;

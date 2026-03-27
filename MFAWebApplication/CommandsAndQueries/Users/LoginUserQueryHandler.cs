@@ -1,14 +1,13 @@
-﻿using AuthenticationWebApplication.DTOs;
+﻿using MFAWebApplication.DTOs;
 using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.Repository;
-using MFAWebApplication.DTOs;
-using MFAWebApplication.Entities;
+using MFAWebApplication.Entities.User;
 using MFAWebApplication.Services;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
-public sealed record LoginUserQuery(UserLoginDTO userLoginDto) : IQuery<LoginSecurityDTO>;
+public sealed record LoginUserQuery(UserLoginDTO UserLoginDto) : IQuery<LoginSecurityDTO>;
 
 internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, LoginSecurityDTO>
 {
@@ -28,10 +27,9 @@ internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Logi
 
     public async Task<Result<LoginSecurityDTO>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
     {
-        var loginDto = request.userLoginDto;
-        var userEmail = loginDto.Email;
+        var loginDto = request.UserLoginDto;
 
-        var user = await _userRepository.GetByPropertyAsync(u => u.Email, userEmail, cancellationToken);
+        var user = await _userRepository.GetByPropertyAsync(u => u.Email, loginDto.Email, cancellationToken);
         if (user == null)
         {
             return Result.Failure<LoginSecurityDTO>("Invalid credentials");
@@ -45,20 +43,27 @@ internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Logi
 
         if (!user.IsMfaEnabled)
         {
+            if (!string.IsNullOrEmpty(loginDto.RequestId))
+            {
+                return await HandleOAuthLogin(user, loginDto.RequestId);
+            }
+
+
             Guid.TryParse(user.Id, out Guid id);
             var token = _securityService.CreateJSONWebToken(id);
-            var result = new LoginSecurityDTO
+            return Result.Success(new LoginSecurityDTO
             {
                 Token = token,
-                RequiresMfa = false,
-                ChallengeId = null
-            };
-
-            return Result.Success(result);
+                RequiresMfa = false
+            });
         }
 
         var challengeId = Guid.NewGuid().ToString();
-        await _cacheService.SetAsync($"mfa_challenge_{challengeId}", user.Id, TimeSpan.FromMinutes(5));
+        await _cacheService.SetAsync(
+            $"mfa_challenge_{challengeId}",
+            new { UserId = user.Id, RequestId = loginDto.RequestId },
+            TimeSpan.FromMinutes(5)
+        );
 
         var mfaResult = new LoginSecurityDTO
         {
@@ -71,4 +76,34 @@ internal sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, Logi
 
     }
 
+    private async Task<Result<LoginSecurityDTO>> HandleOAuthLogin(
+    UserReadModel user,
+    string requestId)
+    {
+        var oauthRequest = await _cacheService
+            .GetAsync<AuthorizationRequestDTO>($"oauth_request_{requestId}");
+
+        if (oauthRequest == null)
+            return Result.Failure<LoginSecurityDTO>("Invalid OAuth request");
+
+        // Generate authorization code
+        var code = Guid.NewGuid().ToString();
+
+        await _cacheService.SetAsync(
+            $"auth_code_{code}",
+            new AuthorizationCodeDTO { UserId = user.Id, ClientId = oauthRequest.ClientId },
+            TimeSpan.FromMinutes(5)
+        );
+
+        var redirectUrl =
+            $"{oauthRequest.RedirectUri}?code={code}&state={oauthRequest.State}";
+
+        return Result.Success(new LoginSecurityDTO
+        {
+            RequiresMfa = false,
+            RedirectUrl = redirectUrl
+        });
+    }
+
 }
+

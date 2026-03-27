@@ -1,11 +1,10 @@
-﻿using AuthenticationWebApplication.DTOs;
-using AuthenticationWebApplication.Enteties;
+﻿using MFAWebApplication.DTOs;
 using AutoMapper;
 using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
-using MFAWebApplication.Entities;
+using MFAWebApplication.Entities.User;
 using MFAWebApplication.Services;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
@@ -41,7 +40,7 @@ internal sealed class CreateUserCommandHandler : ICommandHandler<CreateUserComma
         user.CreateDate = DateTime.UtcNow;
         user.UpdateDate = DateTime.UtcNow;
 
-        await _unitOfWork.Repository<User>().AddAsync(user);
+        await _unitOfWork.Repository<User>().AddAsync(user, cancellationToken);
 
         var userEvent = _mapper.Map<UserUpsertEvent>(user);
         _unitOfWork.AddOutboxEvent(userEvent);

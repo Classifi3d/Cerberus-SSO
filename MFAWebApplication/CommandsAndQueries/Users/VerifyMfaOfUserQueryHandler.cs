@@ -1,22 +1,19 @@
 ﻿
-using AuthenticationWebApplication.Enteties;
 using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
 using MFAWebApplication.DTOs;
+using MFAWebApplication.Entities.User;
 using MFAWebApplication.Services;
-using Microsoft.Extensions.Caching.Memory;
-using OtpNet;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
-public sealed record VerifyMfaOfUserQuery(MfaVerificationDTO verificationDto) : IQuery<string>;
+public sealed record VerifyMfaOfUserQuery(MfaVerificationDTO verificationDto) : IQuery<LoginSecurityDTO>;
 
-internal sealed class VerifyMfaOfUserQueryHandler : IQueryHandler<VerifyMfaOfUserQuery, string>
+internal sealed class VerifyMfaOfUserQueryHandler : IQueryHandler<VerifyMfaOfUserQuery, LoginSecurityDTO>
 {
     private readonly UnitOfWork<WriteDbContext> _unitOfWork;
-
     private readonly ISecurityService _securityService;
     private readonly ICacheService _cacheService;
 
@@ -31,33 +28,86 @@ internal sealed class VerifyMfaOfUserQueryHandler : IQueryHandler<VerifyMfaOfUse
         _cacheService = cacheService;
     }
 
-    public async Task<Result<string>> Handle(VerifyMfaOfUserQuery request, CancellationToken cancellationToken)
+    public async Task<Result<LoginSecurityDTO>> Handle(VerifyMfaOfUserQuery request, CancellationToken cancellationToken)
     {
 
         var verification = request.verificationDto;
 
-        if (!_cacheService.TryGetValue($"mfa_challenge_{verification.ChallengeId}", out Guid userId))
+        var cached = await _cacheService.GetAsync<MfaChallengeDTO>(
+            $"mfa_challenge_{verification.ChallengeId}"
+        );
+
+
+        if (cached is null)
         {
-            return Result.Failure<string>("Challenge token expired or invalid");
+            return Result.Failure<LoginSecurityDTO>("Challenge token expired or invalid");
         }
 
-        var user = await _unitOfWork.Repository<User>().GetByIdAsync(userId, cancellationToken);
+        var user = await _unitOfWork.Repository<User>().GetByIdAsync(Guid.Parse(cached.UserId), cancellationToken);
 
         if (user is null)
-            return Result.Failure<string>("User not found");
+        {
+            return Result.Failure<LoginSecurityDTO>("User not found");
+        }
 
 
-        bool isTotpValid = _securityService.CheckTotp(user.MfaSecretKey, verification.Code);
+        bool isTotpValid = _securityService.CheckTotp(user.MfaSecretKey!, verification.Code);
+
+
+        if (!isTotpValid)
+        {
+            return Result.Failure<LoginSecurityDTO>("Invalid MFA code");
+        }
+
+        if (!string.IsNullOrEmpty(cached.RequestId))
+        {
+            return await HandleOAuthMfa(user, cached.RequestId);
+        }
 
         var token = _securityService.CreateJSONWebToken(user.Id);
 
-        if (token is null || !isTotpValid)
-        {
-            return Result.Failure<string>("Invalid MFA code");
-        }
-
         await _cacheService.RemoveAsync($"mfa_challenge_{verification.ChallengeId}");
 
-        return Result.Success(token);
-    } 
+        return Result.Success(new LoginSecurityDTO
+        {
+            Token = token,
+            RequiresMfa = false
+        });
+    }
+
+    private async Task<Result<LoginSecurityDTO>> HandleOAuthMfa(
+        User user,
+        string requestId)
+    {
+        var oauthRequest = await _cacheService
+            .GetAsync<AuthorizationRequestDTO>($"oauth_request_{requestId}");
+
+        if (oauthRequest == null)
+        {
+            return Result.Failure<LoginSecurityDTO>("Invalid OAuth request");
+        }
+
+        var code = Guid.NewGuid().ToString();
+
+        await _cacheService.SetAsync(
+            $"auth_code_{code}",
+            new AuthorizationCodeDTO
+            {
+                UserId = user.Id.ToString(),
+                ClientId = oauthRequest.ClientId
+            },
+            TimeSpan.FromMinutes(5)
+        );
+
+        var redirectUrl =
+            $"{oauthRequest.RedirectUri}?code={code}&state={oauthRequest.State}";
+
+        await _cacheService.RemoveAsync($"mfa_challenge_{requestId}");
+
+        return Result.Success(new LoginSecurityDTO
+        {
+            RedirectUrl = redirectUrl,
+            RequiresMfa = false
+        });
+    }
 }

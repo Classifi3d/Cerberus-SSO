@@ -8,7 +8,7 @@ public class KafkaConsumerService : BackgroundService
 {
     private readonly IHostApplicationLifetime _appLifetime;
     private readonly IServiceProvider _serviceProvider;
-    private readonly string _topic;
+    private readonly string ?_topic;
     private readonly IConsumer<Null, byte[]> _consumer;
     private readonly IDictionary<string, Type> _projectorTypes;
     private bool _appStarted = false;

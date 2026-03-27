@@ -16,7 +16,7 @@ public class CacheService : ICacheService
         _logger = logger;
     }
 
-    public async Task<T> GetAsync<T>(string key)
+    public async ValueTask<T> GetAsync<T>(string key)
     {
         var value = await _database.StringGetAsync(key);
         if (!value.HasValue)
@@ -25,18 +25,18 @@ public class CacheService : ICacheService
         return JsonSerializer.Deserialize<T>(value);
     }
 
-    public async Task SetAsync<T>(string key, T value, TimeSpan? expiry = null)
+    public async ValueTask SetAsync<T>(string key, T value, TimeSpan? expiry = null)
     {
         var serializedValue = JsonSerializer.Serialize(value);
         await _database.StringSetAsync(key, serializedValue, (Expiration) expiry);
     }
 
-    public async Task<bool> RemoveAsync(string key)
+    public async ValueTask<bool> RemoveAsync(string key)
     {
         return await _database.KeyDeleteAsync(key);
     }
 
-    public async Task<bool> KeyExistsAsync(string key)
+    public async ValueTask<bool> KeyExistsAsync(string key)
     {
         return await _database.KeyExistsAsync(key);
     }

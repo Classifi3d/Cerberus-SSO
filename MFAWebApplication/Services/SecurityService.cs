@@ -1,11 +1,11 @@
-﻿using AuthenticationWebApplication.Enteties;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Security;
 using OtpNet;
 using QRCoder;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MFAWebApplication.Services;
@@ -26,16 +26,16 @@ public class SecurityService : ISecurityService
 
     public string CreateJSONWebToken(Guid userId)
     {
-        List<Claim> claims = new List<Claim>(){
+        var claims = new List<Claim>(){
             new Claim(ClaimTypes.NameIdentifier,userId.ToString())
         };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            _configuration.GetSection("AppSettings:Token").Value));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            _configuration.GetSection("AppSettings:Token").Value!));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.Now.AddHours(1),
-            signingCredentials: creds);
+            expires: DateTime.Now.AddHours(2),
+            signingCredentials: credentials);
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
         return jwt;
@@ -94,8 +94,23 @@ public class SecurityService : ISecurityService
         return OpenBsdBCrypt.Generate(plainPassword.ToCharArray(), salt, costFactor);
     }
 
-    public bool CheckPassword(string plainPassword, string hashPassword)
+    public bool CheckPassword(string plainPassword, string hashedPassword)
     {
-        return OpenBsdBCrypt.CheckPassword(hashPassword, plainPassword.ToCharArray());
+        return OpenBsdBCrypt.CheckPassword(hashedPassword, plainPassword.ToCharArray());
+    }
+
+    public string HashSecret(string plainSecret)
+    {
+        var inputBytes = Encoding.UTF8.GetBytes(plainSecret);
+        var inputHash = SHA256.HashData(inputBytes);
+        return Convert.ToHexString(inputHash);
+    }
+
+    public bool CheckSecret(string plainSecret, string hashedSecret)
+    {
+        var inputBytes = Encoding.UTF8.GetBytes(plainSecret);
+        var inputHash = SHA256.HashData(inputBytes);
+        string hashed = Convert.ToHexString(inputHash);
+        return hashedSecret.Equals(hashed);
     }
 }

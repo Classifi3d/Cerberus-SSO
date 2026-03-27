@@ -1,4 +1,4 @@
-﻿using AuthenticationWebApplication.Enteties;
+﻿using MFAWebApplication.Entities.User;
 using MFAWebApplication.Outbox;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,9 +6,8 @@ namespace MFAWebApplication.Context;
 
 public class WriteDbContext : DbContext
 {
-    public WriteDbContext( DbContextOptions<WriteDbContext> options ) : base(options) { }
+    public WriteDbContext(DbContextOptions<WriteDbContext> options) : base(options) { }
 
-    public DbSet<User> Users => Set<User>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

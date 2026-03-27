@@ -1,6 +1,6 @@
 ﻿using MessagePack;
 using MFAWebApplication.Abstraction.Repository;
-using MFAWebApplication.Entities;
+using MFAWebApplication.Entities.User;
 using MFAWebApplication.Projections.Interfaces;
 
 namespace MFAWebApplication.Projections;

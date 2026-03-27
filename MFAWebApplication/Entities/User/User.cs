@@ -1,10 +1,8 @@
-﻿using MFAWebApplication.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace AuthenticationWebApplication.Enteties;
-
+namespace MFAWebApplication.Entities.User;
 
 [Index(nameof(Id), IsUnique = true)]
 [Index(nameof(Email), IsUnique = true)]

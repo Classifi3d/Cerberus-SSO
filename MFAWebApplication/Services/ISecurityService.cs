@@ -8,4 +8,8 @@ public interface ISecurityService
     public bool CheckTotp(string MfaKey, string TotpCode);
     public string HashPassword(string plainPassword);
     public bool CheckPassword(string plainPassword, string hashPassword);
+    public string HashSecret(string plainSecret);
+    public bool CheckSecret(string plainSecret, string hashedSecret);
+
+
 }
