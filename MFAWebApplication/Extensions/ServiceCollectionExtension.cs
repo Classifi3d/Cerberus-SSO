@@ -54,20 +54,18 @@ public static class ServiceCollectionExtension
         services.AddSingleton<KafkaProducerService>();
         services.AddSingleton<OutboxProcessorService>();
         services.AddHostedService(sp => sp.GetRequiredService<OutboxProcessorService>());
-        // -- OutboxTest
-        //services.AddHostedService<OutboxBackgroundService>();
-        //services.AddScoped<OutboxProcessor>();
-
 
         MessagePackSerializer.DefaultOptions = MessagePackSerializerOptions.Standard.WithResolver(MessagePack.Resolvers.ContractlessStandardResolver.Instance);
 
         // Receiver 
         services.AddHostedService<KafkaConsumerService>();
         services.AddScoped<UserUpsertProjector>();
+        services.AddScoped<UserDeleteProjector>();
+
         var projectorMap = new Dictionary<string, Type>
         {
             [nameof(UserUpsertEvent)] = typeof(UserUpsertProjector),
-            // [OrderCreatedEvent)] = typeof(OrderCreatedProjector)
+            [nameof(UserDeletedEvent)] = typeof(UserDeleteProjector),
         };
         services.AddSingleton<IDictionary<string, Type>>(projectorMap);
 

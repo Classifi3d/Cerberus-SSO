@@ -34,10 +34,9 @@ public class KafkaConsumerService : BackgroundService
             EnableAutoCommit = false,
             // Fetch settings
             FetchWaitMaxMs = 50,                   // Wait max 50ms for data
-            FetchMinBytes = 1,                     // Immediately deliver messages
             MaxPartitionFetchBytes = 4 * 1024 * 1024, // 4 MB per partition
             // Queueing / batching
-            QueuedMinMessages = 1000,              // Minimum buffered
+            QueuedMinMessages = 1000,              // Minimum number buffered
             QueuedMaxMessagesKbytes = 51200,       // 50 MB local queue
             // Heartbeat / session
             SessionTimeoutMs = 10000,
@@ -58,18 +57,20 @@ public class KafkaConsumerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("KafkaConsumerService started. Listening to topic: {topic}", _topic);
-
-        _consumer.Subscribe(_topic);
-
+        _logger.LogInformation("KafkaConsumerService is trying to start. Listening to topic: {topic}", _topic);
         while (!_appStarted && !stoppingToken.IsCancellationRequested)
         {
+            _logger.LogInformation("KafkaConsumerService cannot be started yet. " +
+                "Waiting for application to start.  Listening to topic: {topic}", _topic);
+
             await Task.Delay(1000, stoppingToken);
         }
+        _consumer.Subscribe(_topic);
+        _logger.LogInformation("KafkaConsumerService started. Listening to topic: {topic}", _topic);
 
+        // Starting to consume messages
         int processedSinceCommit = 0;
         var lastCommitTime = DateTime.UtcNow;
-
         try
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -88,6 +89,7 @@ public class KafkaConsumerService : BackgroundService
                 if (result?.Message?.Value == null)
                     continue;
 
+                // Get the event type from Kafka headers
                 string? type = null;
                 var headers = result.Message.Headers;
                 if (headers != null)
@@ -110,8 +112,9 @@ public class KafkaConsumerService : BackgroundService
                     _consumer.Commit(result);
                     continue;
                 }
+
                 if (stoppingToken.IsCancellationRequested)
-                    Console.WriteLine("WARNING: host requested shutdown during processing");
+                    _logger.LogCritical("WARNING: host requested shutdown during processing");
 
                 using var scope = _serviceProvider.CreateScope();
                 var projector = (IEventProjector)scope.ServiceProvider.GetRequiredService(projType);
@@ -128,11 +131,11 @@ public class KafkaConsumerService : BackgroundService
                         _consumer.Commit();
                         lastCommitTime = DateTime.UtcNow;
                         processedSinceCommit = 0;
-                        _logger.LogInformation("Batch of size {BatchSize} committed", BATCH_SIZE);
+                        _logger.LogInformation("Batch of size {BatchSize} processed", BATCH_SIZE);
                     }
-                    catch (KafkaException e)
+                    catch (KafkaException exception)
                     {
-                        _logger.LogError(e, "Error committing Kafka batch");
+                        _logger.LogError("Error processing Kafka batch {Exception}", exception);
                     }
                 }
             }

@@ -24,5 +24,5 @@ public interface IReadModelRepository<TEntity>
     /// Upserts only if the incoming ConcurrencyIndex is greater than the stored one.
     /// Returns true if an insert or update occurred.
     /// </summary>
-    Task<bool> UpsertIfNewerConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default);
+    Task<bool> UpsertIfMatchingConcurrencyAsync(TEntity entity, CancellationToken cancellationToken = default);
 }

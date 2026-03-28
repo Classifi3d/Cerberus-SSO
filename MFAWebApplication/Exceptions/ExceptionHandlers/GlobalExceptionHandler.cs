@@ -1,16 +1,26 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace MFAWebApplication.Exceptions.ExceptionHandlers;
 
-public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
+public class GlobalExceptionHandler() : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext, 
         Exception exception, 
         CancellationToken cancellationToken)
     {
-        logger.LogError(exception, "Unhandled exception occurred.");
+
+        var traceId = httpContext.TraceIdentifier;
+        var request = httpContext.Request;
+
+        Log.ForContext("TraceId", traceId)
+               .ForContext("RequestPath", request.Path)
+               .ForContext("QueryString", request.QueryString.ToString())
+               .ForContext("Method", request.Method)
+               .ForContext("User", httpContext.User?.Identity?.Name ?? "anonymous")
+               .Error(exception, "Unhandled exception occurred");
 
         var problemDetails = new ProblemDetails
         {

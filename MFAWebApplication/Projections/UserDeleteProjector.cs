@@ -1,5 +1,4 @@
-﻿using AuthenticationWebApplication.Enteties;
-using MessagePack;
+﻿using MessagePack;
 using MFAWebApplication.Abstraction.Repository;
 using MFAWebApplication.Entities;
 using MFAWebApplication.Projections.Interfaces;
@@ -14,20 +13,16 @@ public class UserDeleteProjector : IEventProjector
     {
         _repository = repository;
     }
-    public string EventType => nameof(UserDeleteProjector);
+    public string EventType => nameof(UserDeletedEvent);
 
     public async Task ProjectAsync(byte[] payload, CancellationToken cancellationToken)
     {
-        var userEvent = MessagePackSerializer.Deserialize<User>(payload);
+        var userEvent = MessagePackSerializer.Deserialize<UserDeletedEvent>(payload);
         if (userEvent == null) return;
 
         var readModel = new UserReadModel
         {
             Id = userEvent.Id.ToString(),
-            Email = userEvent.Email,
-            Username = userEvent.Username,
-            Password = userEvent.Password,
-            IsMfaEnabled = userEvent.IsMfaEnabled,
             ConcurrencyIndex = userEvent.ConcurrencyIndex
         };
 
