@@ -173,7 +173,7 @@ public class UserController : Controller
     public async Task<IActionResult> VerifyMfaAsync([FromBody] MfaVerificationDTO verificationDto, CancellationToken cancellationToken)
     {
         var query = new VerifyMfaOfUserQuery(verificationDto);
-        var result = await _mediator.Query<VerifyMfaOfUserQuery, string>(query, cancellationToken);
+        var result = await _mediator.Query<VerifyMfaOfUserQuery, LoginSecurityDTO>(query, cancellationToken);
 
         if (result.IsFailure)
         {
