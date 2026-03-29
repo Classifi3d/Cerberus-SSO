@@ -45,18 +45,24 @@ builder.Services.AddCustomRateLimiters();
 builder
     .Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    //.AddJwtBearer(options =>
+    //{
+    //    options.TokenValidationParameters = new TokenValidationParameters
+    //    {
+    //        ValidateIssuerSigningKey = true,
+    //        IssuerSigningKey = new SymmetricSecurityKey(
+    //            Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value!)
+    //        ),
+    //        ValidateIssuer = false,
+    //        ValidateAudience = false
+    //    };
+    //});
     .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)
-            ),
-            ValidateIssuer = false,
-            ValidateAudience = false
-        };
-    });
+     {
+         options.Authority = "https://localhost:5000"; // your SSO
+         options.Audience = "demo_client";
+         options.RequireHttpsMetadata = false;
+     });
 
 // Cross-Origin Resource Sharing
 var allowSpecificOrigin = "_myAllowSpecificOrigins";
@@ -113,8 +119,8 @@ app.UseCors(allowSpecificOrigin);
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-//app.MapGet("/test-ip", (HttpContext context) =>
-//{
-//    return context.Connection.RemoteIpAddress?.ToString() ?? "no ip";
-//});
+app.MapGet("/test-ip", (HttpContext context) =>
+{
+    return context.Connection.RemoteIpAddress?.ToString() ?? "no ip";
+});
 app.Run();

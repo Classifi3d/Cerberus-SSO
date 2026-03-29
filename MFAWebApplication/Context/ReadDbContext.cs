@@ -1,4 +1,4 @@
-﻿using MFAWebApplication.Entities;
+﻿using MFAWebApplication.Entities.User;
 using MongoDB.Driver;
 
 namespace MFAWebApplication.Context;

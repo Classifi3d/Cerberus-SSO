@@ -1,11 +1,10 @@
-﻿using AuthenticationWebApplication.DTOs;
-using AuthenticationWebApplication.Enteties;
+﻿using MFAWebApplication.DTOs;
 using AutoMapper;
 using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
-using MFAWebApplication.Entities;
+using MFAWebApplication.Entities.User;
 using MFAWebApplication.Services;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;

@@ -1,12 +1,12 @@
-﻿using AuthenticationWebApplication.Enteties;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
+using MFAWebApplication.Entities.User;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
-public sealed record DisableMfaOfUserCommand( Guid userId ) : ICommand;
+public sealed record DisableMfaOfUserCommand(Guid userId) : ICommand;
 
 internal sealed class DisableMfaOfUserCommandHandler : ICommandHandler<DisableMfaOfUserCommand>
 {

@@ -1,4 +1,4 @@
-﻿namespace MFAWebApplication.Entities;
+﻿namespace MFAWebApplication.Entities.User;
 
 public class UserDeletedEvent
 {

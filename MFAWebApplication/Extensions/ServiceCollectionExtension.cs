@@ -5,7 +5,7 @@ using MFAWebApplication.Abstraction.Repository;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
 using MFAWebApplication.DTOs;
-using MFAWebApplication.Entities;
+using MFAWebApplication.Entities.User;
 using MFAWebApplication.Kafka;
 using MFAWebApplication.Outbox;
 using MFAWebApplication.Projections;
@@ -45,6 +45,7 @@ public static class ServiceCollectionExtension
 
         // Services
         services.AddScoped<ISecurityService, SecurityService>();
+        services.AddScoped<ITokenService, TokenService>();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.AddSingleton(MapperConfiguration.InitializeAutomapper());
         services.AddMemoryCache();

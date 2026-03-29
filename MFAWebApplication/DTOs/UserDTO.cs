@@ -1,4 +1,4 @@
-﻿namespace AuthenticationWebApplication.DTOs
+﻿namespace MFAWebApplication.DTOs
 {
     public class UserDTO
     {

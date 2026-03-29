@@ -1,7 +1,6 @@
-﻿using AuthenticationWebApplication.DTOs;
-using AuthenticationWebApplication.Enteties;
+﻿using MFAWebApplication.DTOs;
 using AutoMapper;
-using MFAWebApplication.Entities;
+using MFAWebApplication.Entities.User;
 
 namespace MFAWebApplication.DTOs;
 

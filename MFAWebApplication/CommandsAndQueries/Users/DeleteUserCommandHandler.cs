@@ -1,10 +1,9 @@
-﻿using AuthenticationWebApplication.Enteties;
-using AutoMapper;
+﻿using AutoMapper;
 using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.UnitOfWork;
 using MFAWebApplication.Context;
-using MFAWebApplication.Entities;
+using MFAWebApplication.Entities.User;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
@@ -28,7 +27,7 @@ internal sealed class DeleteUserCommandHandler
     public async Task<Result> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
 
-        var user = await _unitOfWork.Repository<User>().GetByIdAsync(request.UserId);
+        var user = await _unitOfWork.Repository<User>().GetByIdAsync(request.UserId, cancellationToken);
         if (user is null)
         {
             return Result.Failure("User not found.");
@@ -39,7 +38,7 @@ internal sealed class DeleteUserCommandHandler
         var userEvent = _mapper.Map<UserDeletedEvent>(user);
         _unitOfWork.AddOutboxEvent(userEvent);
 
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success("User deleted");
     }

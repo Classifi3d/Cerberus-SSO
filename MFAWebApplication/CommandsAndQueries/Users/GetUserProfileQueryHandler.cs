@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using MFAWebApplication.Abstraction.Messaging;
 using MFAWebApplication.Abstraction.Repository;
-using MFAWebApplication.Entities;
+using MFAWebApplication.Entities.User;
 
 namespace MFAWebApplication.CommandsAndQueries.Users;
 
@@ -26,7 +26,7 @@ internal sealed class GetUserProfileQueryHandler
         //    request.UserId.ToString(),
         //    cancellationToken);
 
-        var user = await _userRepository.GetByIdAsync(request.UserId);
+        var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
 
         if (user is null)
             return Result.Failure<UserReadModel>("User not found");
