@@ -1,14 +1,13 @@
-﻿using MFAWebApplication.DTOs;
-using MFAWebApplication.Abstraction;
-using MFAWebApplication.CommandsAndQueries.Users;
-using MFAWebApplication.Entities.User;
+﻿using Application.Abstraction;
+using Application.CommandsAndQueries.Users;
+using Application.DTOs;
+using Domain.Entities.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
-
-namespace MFAWebApplication.Controllers;
+namespace Presentation.Controllers;
 
 [ApiController]
 [Route("[controller]")]

@@ -1,12 +1,11 @@
-﻿using MFAWebApplication.Exceptions.ExceptionHandlers;
+﻿using Presentation.Exceptions.ExceptionHandlers;
 
-namespace MFAWebApplication.Extensions;
+namespace Presentation.Extensions;
 
 public static class ExceptionsExtension
 {
     public static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
     {
-
         services.AddExceptionHandler<GlobalExceptionHandler>();
 
         return services;

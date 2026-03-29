@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
-namespace MFAWebApplication.Configurations;
+namespace Presentation.Configurations;
 
 public static class RateLimiterExtension
 {
@@ -24,13 +24,13 @@ public static class RateLimiterExtension
             //            }));
             //});
 
-            //options.AddFixedWindowLimiter("registerLimiter", opt =>
-            //{
-            //    opt.PermitLimit = 5; // Max 5 registrations per minute
-            //    opt.Window = TimeSpan.FromMinutes(1);
-            //    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-            //    opt.QueueLimit = 2; // Allows 2 extra attempts to queue
-            //});
+            options.AddFixedWindowLimiter("registerLimiter", opt =>
+            {
+                opt.PermitLimit = 5; // Max 5 registrations per minute
+                opt.Window = TimeSpan.FromMinutes(1);
+                opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                opt.QueueLimit = 2; // Allows 2 extra attempts to queue
+            });
 
             // Login limiter
             options.AddTokenBucketLimiter("loginLimiter", opt =>

@@ -1,10 +1,9 @@
-﻿using MFAWebApplication.Abstraction;
-using MFAWebApplication.CommandsAndQueries.Clients;
-using MFAWebApplication.DTOs;
+﻿using Application.Abstraction;
+using Application.CommandsAndQueries.Clients;
+using Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Ocsp;
 
-namespace MFAWebApplication.Controllers;
+namespace Presentation.Controllers;
 
 [ApiController]
 [Route("[controller]")]

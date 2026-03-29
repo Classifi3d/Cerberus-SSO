@@ -3,7 +3,7 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 
-namespace MFAWebApplication.Extensions;
+namespace Presentation.Extensions;
 
 public static class LoggerConfigurator
 {

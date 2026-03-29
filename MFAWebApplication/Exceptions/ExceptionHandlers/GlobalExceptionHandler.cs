@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
-namespace MFAWebApplication.Exceptions.ExceptionHandlers;
+namespace Presentation.Exceptions.ExceptionHandlers;
 
 public class GlobalExceptionHandler() : IExceptionHandler
 {
