@@ -2,7 +2,7 @@
 
 A modern authentication platform built using **Clean Architecture** and **CQRS**, designed to support scalable **Single Sign-On (SSO)** and **Multi-Factor Authentication (MFA)** flows. The system focuses on clear separation of concerns, extensibility, and production-grade design patterns.
 
-[DEMO VIDEO]
+https://github.com/user-attachments/assets/9518f0f2-89fd-4101-ac5d-4c1d3cb1d82b
 
 This project implements a centralized identity service responsible for authentication, authorization, and secure user management across multiple clients.
 
