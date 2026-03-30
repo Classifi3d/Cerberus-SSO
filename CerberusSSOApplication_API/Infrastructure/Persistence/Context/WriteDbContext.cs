@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Entities.Client;
 using Domain.Entities.User;
 using Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,10 @@ public class WriteDbContext : DbContext
 
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<User> Users { get; set; }
-    public DbSet<User> Clients { get; set; }
+    public DbSet<Client> Clients { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
         modelBuilder.Entity<OutboxMessage>().HasKey(x => x.Id);
 
         modelBuilder.Entity<OutboxMessage>().HasIndex(x => new { x.ProcessedAt, x.CreatedAt })
@@ -31,16 +33,17 @@ public class WriteDbContext : DbContext
 
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
+            Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
             if (entry.State == EntityState.Added)
             {
                 entry.Property(x => x.CreateDate).CurrentValue = utcNow;
                 entry.Property(x => x.UpdateDate).CurrentValue = utcNow;
             }
 
-            entry.Property(x => x.UpdateDate).CurrentValue = utcNow;
             if (entry.State == EntityState.Modified)
             {
-                entry.Entity.ConcurrencyIndex++;
+                entry.Property(x => x.ConcurrencyIndex).CurrentValue =
+                    entry.Entity.ConcurrencyIndex + 1;
             }
         }
 
