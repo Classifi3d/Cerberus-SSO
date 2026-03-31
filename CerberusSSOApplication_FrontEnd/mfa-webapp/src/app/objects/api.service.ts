@@ -38,7 +38,7 @@ export class ApiService {
 			mfaVerification,
 			{
 				headers: this.headers,
-			}
+			},
 		);
 	}
 
@@ -49,7 +49,7 @@ export class ApiService {
 			{
 				headers: this.logedInHeader,
 				responseType: 'blob' as 'json', // Make sure the response type is Blob
-			}
+			},
 		);
 	}
 
@@ -57,7 +57,7 @@ export class ApiService {
 		return this.http.post<any>(
 			`${this.url}/user/disable-mfa`,
 			{},
-			{ headers: this.logedInHeader }
+			{ headers: this.logedInHeader },
 		);
 	}
 
@@ -73,6 +73,62 @@ export class ApiService {
 	public getUserData(): Observable<any> {
 		return this.http.get<any>(`${this.url}/user/user-data`, {
 			headers: this.logedInHeader,
+		});
+	}
+
+	// ========== OAUTH ==========
+
+	// Redirect user to authorization endpoint
+	public authorizeClient(params: {
+		client_id: string;
+		redirect_uri: string;
+		response_type: string;
+		scope?: string;
+		state?: string;
+	}): void {
+		const httpParams = new HttpParams()
+			.set('client_id', params.client_id)
+			.set('redirect_uri', params.redirect_uri)
+			.set('response_type', params.response_type)
+			.set('scope', params.scope || '')
+			.set('state', params.state || '');
+
+		// Browser redirect
+		window.location.href = `${this.url}/OAuth/authorize?${httpParams.toString()}`;
+	}
+
+	// Exchange authorization code for tokens
+	public exchangeToken(data: {
+		grant_type: string; // "authorization_code"
+		code: string;
+		redirect_uri: string;
+		client_id: string;
+		client_secret: string;
+	}): Observable<any> {
+		const body = new HttpParams()
+			.set('grant_type', data.grant_type)
+			.set('code', data.code)
+			.set('redirect_uri', data.redirect_uri)
+			.set('client_id', data.client_id)
+			.set('client_secret', data.client_secret);
+
+		const headers = new HttpHeaders({
+			'Content-Type': 'application/x-www-form-urlencoded',
+		});
+
+		return this.http.post<any>(`${this.url}/OAuth/token`, body.toString(), {
+			headers,
+		});
+	}
+
+	// Create OAuth client
+	public createOAuthClient(client: {
+		clientId: string;
+		clientSecret: string;
+		redirectUris: string[];
+	}): Observable<any> {
+		return this.http.post<any>(`${this.url}/OAuth/clients`, client, {
+			headers: this.headers,
 		});
 	}
 }
