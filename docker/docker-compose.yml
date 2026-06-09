@@ -1,0 +1,102 @@
+services:
+  api:
+    image: ghcr.io/YOUR_USER/cerberus-api:latest
+    container_name: cerberus-api
+    restart: always
+    ports:
+      - "5211:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__PostgreSQL_Write_Connection_String=Server=postgres:5432;User ID=postgres;Password=password;Database=AuthenticationWriteDB;Include Error Detail=true;
+      - ConnectionStrings__MongoDB_Read_Connection_String=mongodb://mongo:27017
+      - ConnectionStrings__Redis=redis:6379,abortConnect=false,connectTimeout=30000,syncTimeout=30000
+      - Kafka__BootstrapServers=kafka:9092
+      - Kafka__Topic=cqrs_user_events
+      - Kafka__ConsumerGroupId=read-db-consumer
+      - MongoSettings__DatabaseName=AuthenticationReadDB
+      - Elasticsearch__Uri=http://elasticsearch:9200
+      - AppSettings__Token=DHYN523AX0TG2UfJUzMdD7xas5SjE9N14WbGEUtF0wuDr4RARNIF5xaLWwq3AAag
+
+    depends_on:
+      - postgres
+      - mongo
+      - redis
+      - kafka
+      - elasticsearch
+
+  web:
+    image: ghcr.io/YOUR_USER/cerberus-web:latest
+    container_name: cerberus-web
+    restart: always
+    ports:
+      - "80:80"
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: AuthenticationWriteDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
+    restart: always
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: kibana
+    restart: always
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+volumes:
+  pgdata:
+  mongodata:
+  esdata:

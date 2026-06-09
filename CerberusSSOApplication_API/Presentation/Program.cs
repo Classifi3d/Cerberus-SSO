@@ -16,9 +16,9 @@ var builder = WebApplication.CreateBuilder(args);
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Host.UseSerilog(LoggerConfigurator.ConfigureLogger(builder.Configuration));
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
