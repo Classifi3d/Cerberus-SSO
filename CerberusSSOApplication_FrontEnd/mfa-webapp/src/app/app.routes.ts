@@ -4,8 +4,8 @@ import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import { MultiFactorAuthComponent } from './pages/multi-factor-auth/multi-factor-auth.component';
 import { MultiFactorGenerateComponent } from './pages/multi-factor-generate/multi-factor-generate.component';
 import { UserMenuComponent } from './pages/user-menu/user-menu.component';
-import { oauthGuard } from './guards/oauth.guard';
-import { challengeGuard } from './guards/challenge.guard';
+import { oauthGuard } from './core/guards/oauth.guard';
+import { challengeGuard } from './core/guards/challenge.guard';
 
 export const routes: Routes = [
 	{ path: '', component: LoginComponent },

@@ -1,8 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User } from './user.model';
-import { MfaVerificationDto } from './mfa-verification.model';
+import { User } from '../models/user.model';
+import { MfaVerificationDto } from '../models/mfa-verification.model';
 
 @Injectable({
 	providedIn: 'root',
@@ -15,18 +15,19 @@ export class ApiService {
 		'Access-Control-Allow-Origin': '*',
 	});
 
-	private logedInHeader = new HttpHeaders({
-		'Content-Type': 'application/json',
-		'Access-Control-Allow-Origin': '*',
-		Authorization: `Bearer ${localStorage.getItem('OAuth-Token')}`,
-	});
+	private getAuthHeaders(): HttpHeaders {
+		return new HttpHeaders({
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${localStorage.getItem('OAuth-Token')}`,
+		});
+	}
 
 	private paramsUsers = new HttpParams();
 
 	// ========== LOGIN ==========
 	public loginUser(user: User): Observable<any> {
 		return this.http.post<any>(`${this.url}/user/login`, user, {
-			headers: this.headers,
+			headers: this.getAuthHeaders(),
 		});
 	}
 
@@ -37,7 +38,7 @@ export class ApiService {
 			`${this.url}/user/verify-mfa`,
 			mfaVerification,
 			{
-				headers: this.headers,
+				headers: this.getAuthHeaders(),
 			},
 		);
 	}
@@ -47,7 +48,7 @@ export class ApiService {
 			`${this.url}/user/enable-mfa`,
 			{},
 			{
-				headers: this.logedInHeader,
+				headers: this.getAuthHeaders(),
 				responseType: 'blob' as 'json', // Make sure the response type is Blob
 			},
 		);
@@ -57,7 +58,7 @@ export class ApiService {
 		return this.http.post<any>(
 			`${this.url}/user/disable-mfa`,
 			{},
-			{ headers: this.logedInHeader },
+			{ headers: this.getAuthHeaders() },
 		);
 	}
 
@@ -72,7 +73,7 @@ export class ApiService {
 	// ========== USER MENU ==========
 	public getUserData(): Observable<any> {
 		return this.http.get<any>(`${this.url}/user/user-data`, {
-			headers: this.logedInHeader,
+			headers: this.getAuthHeaders(),
 		});
 	}
 

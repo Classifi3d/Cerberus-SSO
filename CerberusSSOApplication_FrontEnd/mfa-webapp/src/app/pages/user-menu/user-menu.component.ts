@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { User } from '../../objects/user.model';
-import { ApiService } from '../../objects/api.service';
+import { User } from '../../core/models/user.model';
+import { ApiService } from '../../core/services/api.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -20,7 +20,10 @@ export class UserMenuComponent implements OnInit {
 	public challangeToken: string | null = null;
 	public oAuthTokenSmall: string | null | undefined = null;
 
-	constructor(private apiService: ApiService, private router: Router) {}
+	constructor(
+		private apiService: ApiService,
+		private router: Router,
+	) {}
 
 	public async ngOnInit(): Promise<void> {
 		await this.fetchUserData();
@@ -68,7 +71,7 @@ export class UserMenuComponent implements OnInit {
 			error: (error) => {
 				console.error(
 					'Error disabling multi-factor authentication:',
-					error
+					error,
 				);
 			},
 		});

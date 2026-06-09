@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ApiService } from '../../objects/api.service';
+import { ApiService } from '../../core/services/api.service';
 import {
 	FormGroup,
 	FormBuilder,
@@ -8,7 +8,7 @@ import {
 	ReactiveFormsModule,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { User } from '../../objects/user.model';
+import { User } from '../../core/models/user.model';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,7 +35,7 @@ export class SignUpComponent {
 	constructor(
 		private apiService: ApiService,
 		private formBuilder: FormBuilder,
-		private router: Router
+		private router: Router,
 	) {
 		this.signUpForm = this.formBuilder.group({
 			email: ['', [Validators.required, Validators.email]],
