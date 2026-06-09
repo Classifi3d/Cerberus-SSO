@@ -11,29 +11,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ---------- LOGIN GHCR ----------
+      - name: Set image base name
+        run: echo "IMAGE_BASE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
       - name: Login to GHCR
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      # ---------- API BUILD ----------
+      # ---------- API ----------
       - name: Build API image
         run: |
           docker build \
             -f docker/api.Dockerfile \
-            -t ghcr.io/${{ github.repository }}-api:latest .
+            -t $IMAGE_BASE-api:latest .
 
       - name: Push API
-        run: docker push ghcr.io/${{ github.repository }}-api:latest
+        run: docker push $IMAGE_BASE-api:latest
 
-      # ---------- WEB BUILD ----------
+      # ---------- WEB ----------
       - name: Build Web image
         run: |
           docker build \
             -f docker/web.Dockerfile \
-            -t ghcr.io/${{ github.repository }}-web:latest .
+            -t $IMAGE_BASE-web:latest .
 
       - name: Push Web
-        run: docker push ghcr.io/${{ github.repository }}-web:latest
+        run: docker push $IMAGE_BASE-web:latest
 
   deploy:
     needs: build
