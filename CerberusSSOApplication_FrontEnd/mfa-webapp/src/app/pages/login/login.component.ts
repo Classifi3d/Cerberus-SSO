@@ -7,12 +7,12 @@ import {
 	FormsModule,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { User } from '../../objects/user.model';
+import { User } from '../../core/models/user.model';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
-import { ApiService } from '../../objects/api.service';
+import { ApiService } from '../../core/services/api.service';
 @Component({
 	selector: 'app-login',
 	standalone: true,
@@ -34,7 +34,7 @@ export class LoginComponent {
 	constructor(
 		private formBuilder: FormBuilder,
 		private apiService: ApiService,
-		private router: Router
+		private router: Router,
 	) {
 		this.loginForm = this.formBuilder.group({
 			email: ['', [Validators.required, Validators.email]],
