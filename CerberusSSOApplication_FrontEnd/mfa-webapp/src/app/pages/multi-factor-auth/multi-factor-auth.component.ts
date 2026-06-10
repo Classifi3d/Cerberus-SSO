@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MfaVerificationDto } from '../../objects/mfa-verification.model';
-import { ApiService } from '../../objects/api.service';
+import { MfaVerificationDto } from '../../core/models/mfa-verification.model';
+import { ApiService } from '../../core/services/api.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -14,7 +14,10 @@ import { Router } from '@angular/router';
 })
 export class MultiFactorAuthComponent {
 	error: string | null = null;
-	constructor(private apiService: ApiService, private router: Router) {}
+	constructor(
+		private apiService: ApiService,
+		private router: Router,
+	) {}
 	pin: string[] = ['', '', '', '', '', ''];
 
 	public onInput(currentIndex: number, event: any): void {
@@ -28,7 +31,7 @@ export class MultiFactorAuthComponent {
 		if (event.target.value && currentIndex < 5) {
 			setTimeout(() => {
 				const nextInput = document.getElementsByName(
-					`pin${currentIndex + 1}`
+					`pin${currentIndex + 1}`,
 				)[0] as HTMLInputElement;
 				if (nextInput) {
 					nextInput.value = '';
@@ -41,7 +44,7 @@ export class MultiFactorAuthComponent {
 	public onFocus(currentIndex: number): void {
 		setTimeout(() => {
 			const inputElement = document.getElementsByName(
-				`pin${currentIndex}`
+				`pin${currentIndex}`,
 			)[0] as HTMLInputElement;
 			if (inputElement && inputElement.value === '') {
 				inputElement.value = '';

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../objects/api.service';
+import { ApiService } from '../../core/services/api.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -11,7 +11,10 @@ import { CommonModule } from '@angular/common';
 })
 export class MultiFactorGenerateComponent implements OnInit {
 	public qrCodeImage: string | null = null;
-	constructor(private apiService: ApiService, private router: Router) {}
+	constructor(
+		private apiService: ApiService,
+		private router: Router,
+	) {}
 
 	public async ngOnInit(): Promise<void> {
 		await this.generateQrCode();
