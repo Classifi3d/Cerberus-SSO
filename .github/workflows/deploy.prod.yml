@@ -81,8 +81,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Debug repo structure
-        run: ls -R
+      - name: Debug workspace
+        run: |
+          pwd
+          ls -R
 
       - name: Copy docker-compose.yml
         uses: appleboy/scp-action@v0.1.7
