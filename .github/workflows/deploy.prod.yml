@@ -17,6 +17,22 @@ jobs:
       - name: Login to GHCR
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       # ---------- x86 ----------
       # - name: Build API image
       #   run: |
@@ -47,6 +63,8 @@ jobs:
           push: true
           platforms: linux/arm64
           tags: ${{ env.IMAGE_BASE }}-web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build and push Web
         uses: docker/build-push-action@v6
@@ -56,19 +74,23 @@ jobs:
           push: true
           platforms: linux/arm64
           tags: ${{ env.IMAGE_BASE }}-web:latest
-
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug repo structure
+        run: ls -R
+
       - name: Copy docker-compose.yml
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.PI_HOST }}
           username: ${{ secrets.PI_USER }}
           key: ${{ secrets.PI_SSH_KEY }}
-          source: "docker/docker-compose.yml"
+          source: "./docker/docker-compose.yml"
           target: "/home/dan/app/docker-compose.yml"
 
       - name: Deploy to Raspberry Pi
