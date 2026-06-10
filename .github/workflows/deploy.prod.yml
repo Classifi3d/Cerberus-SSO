@@ -90,7 +90,7 @@ jobs:
           script: |
             cd /home/dan/app
 
-            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u Classifi3d --password-stdin
 
             docker compose pull
-            docker compose up -d
+            docker compose up -d --remove-orphans
