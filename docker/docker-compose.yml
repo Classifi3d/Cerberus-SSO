@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/YOUR_USER/cerberus-api:latest
+    image: ghcr.io/classifi3d/cerberus-sso-api:latest
     container_name: cerberus-api
     restart: always
     ports:
@@ -25,7 +25,7 @@ services:
       - elasticsearch
 
   web:
-    image: ghcr.io/YOUR_USER/cerberus-web:latest
+    image: ghcr.io/classifi3d/cerberus-sso-web:latest
     container_name: cerberus-web
     restart: always
     ports:
