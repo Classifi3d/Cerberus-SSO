@@ -17,31 +17,60 @@ jobs:
       - name: Login to GHCR
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      # ---------- API ----------
-      - name: Build API image
-        run: |
-          docker build \
-            -f docker/api.Dockerfile \
-            -t $IMAGE_BASE-api:latest .
+      # ---------- x86 ----------
+      # - name: Build API image
+      #   run: |
+      #     docker build \
+      #       -f docker/api.Dockerfile \
+      #       -t $IMAGE_BASE-api:latest .
 
-      - name: Push API
-        run: docker push $IMAGE_BASE-api:latest
+      # - name: Push API
+      #   run: docker push $IMAGE_BASE-api:latest
+      # - name: Build Web image
+      #   run: |
+      #     docker build \
+      #       -f docker/web.Dockerfile \
+      #       -t $IMAGE_BASE-web:latest .
 
-      # ---------- WEB ----------
-      - name: Build Web image
-        run: |
-          docker build \
-            -f docker/web.Dockerfile \
-            -t $IMAGE_BASE-web:latest .
+      # - name: Push Web
+      #   run: docker push $IMAGE_BASE-web:latest
 
-      - name: Push Web
-        run: docker push $IMAGE_BASE-web:latest
+      # ---------- ARM ----------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push API
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/api.Dockerfile
+          push: true
+          platforms: linux/arm64
+          tags: ${{ env.IMAGE_BASE }}-web:latest
+
+      - name: Build and push Web
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/web.Dockerfile
+          push: true
+          platforms: linux/arm64
+          tags: ${{ env.IMAGE_BASE }}-web:latest
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
+      - name: Copy docker-compose.yml
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PI_HOST }}
+          username: ${{ secrets.PI_USER }}
+          key: ${{ secrets.PI_SSH_KEY }}
+          source: "docker/docker-compose.yml"
+          target: "/home/dan/app/docker-compose.yml"
+
       - name: Deploy to Raspberry Pi
         uses: appleboy/ssh-action@v1.0.3
         with:
