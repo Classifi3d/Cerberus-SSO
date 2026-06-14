@@ -101,13 +101,15 @@ jobs:
           script: |
             cd /home/dan/app
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker compose -f docker/docker-compose.yml pull
 
-            # Stop existing services and clear out any stuck anonymous volumes/containers
-            docker compose -f docker/docker-compose.yml down
+            echo "1. Pull the fresh images"
+            docker compose -f docker/docker-compose.yml -p cerberus pull
 
-            # Bring everything up freshly, forcing recreation of conflicting states
-            docker compose -f docker/docker-compose.yml up -d --force-recreate --remove-orphans
+            echo "2. Shut down the unified project stack safely"
+            docker compose -f docker/docker-compose.yml -p cerberus down
+
+            echo "3. Bring the stack up under the clean, unified project name"
+            docker compose -f docker/docker-compose.yml -p cerberus up -d --force-recreate --remove-orphans
 
   deploy-azure:
     needs:
@@ -140,6 +142,14 @@ jobs:
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
             cd /home/dan/app
+
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker compose -f docker/docker-compose.yml pull
-            docker compose -f docker/docker-compose.yml up -d --remove-orphans
+
+            echo "1. Pull the fresh images"
+            docker compose -f docker/docker-compose.yml -p cerberus pull
+
+            echo "2. Shut down the unified project stack safely"
+            docker compose -f docker/docker-compose.yml -p cerberus down
+
+            echo "3. Bring the stack up under the clean, unified project name"
+            docker compose -f docker/docker-compose.yml -p cerberus up -d --force-recreate --remove-orphans
