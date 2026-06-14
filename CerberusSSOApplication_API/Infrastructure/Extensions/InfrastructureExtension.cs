@@ -39,6 +39,9 @@ public static class InfrastructureExtension
         //        )
         //);
 
+
+        builder.Services.AddHostedService<DatabaseMigrationWorker>();
+
         return builder;
     }
 }
