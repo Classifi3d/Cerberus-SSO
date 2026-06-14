@@ -25,10 +25,10 @@ public static class LoggerConfigurator
             .Enrich.FromLogContext();
 
         // 4. Sinks
-        var elasticUri = configuration["Elasticsearch:Uri"] ?? "";
+        var elasticUri = configuration.GetConnectionString("Elasticsearch");
         serilogConfig
             .WriteTo.Console()
-            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri))
+            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri!))
             {
                 AutoRegisterTemplate = true,
                 IndexFormat = "mfawebapplication-development-{0:yyyy-MM}",
