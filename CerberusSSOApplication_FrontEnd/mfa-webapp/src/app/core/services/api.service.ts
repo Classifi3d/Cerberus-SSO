@@ -3,13 +3,14 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.model';
 import { MfaVerificationDto } from '../models/mfa-verification.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class ApiService {
 	private http = inject(HttpClient);
-	private url = 'https://localhost:7077';
+	private readonly url = environment.apiUrl;
 	private headers = new HttpHeaders({
 		'Content-Type': 'application/json',
 		'Access-Control-Allow-Origin': '*',
