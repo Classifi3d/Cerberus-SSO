@@ -74,9 +74,9 @@ builder
     {
         options.AddPolicy(
             allowSpecificOrigin,
-            builder =>
+            corsPolicyBuilder =>
             {
-                builder
+                corsPolicyBuilder
                     .WithOrigins("http://localhost:4200")
                     .AllowAnyHeader()
                     .AllowAnyMethod()

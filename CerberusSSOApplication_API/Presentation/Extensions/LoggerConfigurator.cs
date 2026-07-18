@@ -26,6 +26,7 @@ public static class LoggerConfigurator
 
         // 4. Sinks
         var elasticUri = configuration.GetConnectionString("Elasticsearch");
+        
         serilogConfig
             .WriteTo.Console()
             .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri!))
