@@ -7,16 +7,15 @@ services:
       - "5211:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__PostgreSQL_Write_Connection_String=Server=postgres:5432;User ID=postgres;Password=password;Database=AuthenticationWriteDB;Include Error Detail=true;
+      - ConnectionStrings__PostgreSQL_Write_Connection_String=Server=postgres;Port=5432;User ID=postgres;Password=password;Database=AuthenticationWriteDB;Include Error Detail=true;
       - ConnectionStrings__MongoDB_Read_Connection_String=mongodb://mongo:27017
       - ConnectionStrings__Redis=redis:6379,abortConnect=false,connectTimeout=30000,syncTimeout=30000
+      - ConnectionStrings__Elasticsearch=http://elasticsearch:9200
       - Kafka__BootstrapServers=kafka:9092
       - Kafka__Topic=cqrs_user_events
       - Kafka__ConsumerGroupId=read-db-consumer
       - MongoSettings__DatabaseName=AuthenticationReadDB
-      - Elasticsearch__Uri=http://elasticsearch:9200
       - AppSettings__Token=DHYN523AX0TG2UfJUzMdD7xas5SjE9N14WbGEUtF0wuDr4RARNIF5xaLWwq3AAag
-
     depends_on:
       - postgres
       - mongo
@@ -76,15 +75,17 @@ services:
       - zookeeper
     ports:
       - "9092:9092"
+    networks:
+      default:
+        aliases:
+          - kafka
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-
-      # IMPORTANT FIX
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OPTS: "-Xmx512m -Xms512m"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4

@@ -116,3 +116,18 @@ UpgradeLog*.htm
 **/App_Data/*.mdf
 **/App_Data/*.ldf
 **/App_Data/*.sdf
+
+
+
+# Rider / JetBrains specific user configuration
+*.sln.DotSettings.user
+
+# If you share the .idea folder but want to ignore personal workspace layouts
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# Finder MacOS
+.DS_Store

@@ -1,5 +1,8 @@
 name: Build and Deploy
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
@@ -30,9 +33,7 @@ jobs:
         run: echo "IMAGE_BASE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Login to GHCR
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io \
-          -u ${{ github.actor }} \
-          --password-stdin
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - uses: docker/setup-buildx-action@v3
 
@@ -55,9 +56,7 @@ jobs:
         run: echo "IMAGE_BASE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Login to GHCR
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io \
-          -u ${{ github.actor }} \
-          --password-stdin
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - uses: docker/setup-buildx-action@v3
 
@@ -77,11 +76,9 @@ jobs:
     runs-on: ubuntu-latest
 
     if: |
-      (github.event_name == 'push' &&
-      github.ref == 'refs/heads/dev')
+      (github.event_name == 'push' && github.ref == 'refs/heads/dev')
       ||
-      (github.event_name == 'workflow_dispatch' &&
-      github.event.inputs.target == 'pi')
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'pi')
 
     steps:
       - uses: actions/checkout@v4
@@ -103,13 +100,16 @@ jobs:
           key: ${{ secrets.PI_SSH_KEY }}
           script: |
             cd /home/dan/app
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io \
-              -u ${{ github.actor }} \
-              --password-stdin
+            echo "1. Pull the fresh images"
+            docker compose -f docker/docker-compose.yml -p cerberus pull
 
-            docker compose -f docker/docker-compose.yml pull
-            docker compose -f docker/docker-compose.yml up -d --remove-orphans
+            echo "2. Shut down the unified project stack safely"
+            docker compose -f docker/docker-compose.yml -p cerberus down
+
+            echo "3. Bring the stack up under the clean, unified project name"
+            docker compose -f docker/docker-compose.yml -p cerberus up -d --force-recreate --remove-orphans
 
   deploy-azure:
     needs:
@@ -118,11 +118,9 @@ jobs:
     runs-on: ubuntu-latest
 
     if: |
-      (github.event_name == 'push' &&
-      github.ref == 'refs/heads/main')
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
       ||
-      (github.event_name == 'workflow_dispatch' &&
-      github.event.inputs.target == 'azure')
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'azure')
 
     steps:
       - uses: actions/checkout@v4
@@ -145,10 +143,13 @@ jobs:
           script: |
             cd /home/dan/app
 
-            echo "${{ secrets.GHCR_TOKEN }}" \
-              | docker login ghcr.io \
-              -u ${{ github.actor }} \
-              --password-stdin
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            docker compose -f docker/docker-compose.yml pull
-            docker compose -f docker/docker-compose.yml up -d --remove-orphans
+            echo "1. Pull the fresh images"
+            docker compose -f docker/docker-compose.yml -p cerberus pull
+
+            echo "2. Shut down the unified project stack safely"
+            docker compose -f docker/docker-compose.yml -p cerberus down
+
+            echo "3. Bring the stack up under the clean, unified project name"
+            docker compose -f docker/docker-compose.yml -p cerberus up -d --force-recreate --remove-orphans

@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PkceService } from './pkce.service';
 import { StorageService } from './storage.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
 	providedIn: 'root',
@@ -12,7 +13,7 @@ export class OAuthService {
 	private pkceService = inject(PkceService);
 	private storage = inject(StorageService);
 
-	private readonly apiUrl = 'https://localhost:7077';
+	private readonly apiUrl = environment.apiUrl;
 
 	async authorize(): Promise<void> {
 		const verifier = this.pkceService.generateCodeVerifier();
@@ -23,8 +24,8 @@ export class OAuthService {
 		this.storage.setPkceVerifier(verifier);
 
 		const params = new HttpParams()
-			.set('client_id', 'angular-spa')
-			.set('redirect_uri', 'http://localhost:4200/callback')
+			.set('client_id', environment.oauth.clientId)
+			.set('redirect_uri', environment.oauth.redirectUri)
 			.set('response_type', 'code')
 			.set('scope', 'openid profile')
 			.set('code_challenge', challenge)
