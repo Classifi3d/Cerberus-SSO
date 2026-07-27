@@ -72,12 +72,19 @@ builder
     .Services
     .AddCors(options =>
     {
+        // Read from configuration: the Angular MFA app is no longer the only client -
+        // the Synapse Analyzer SPA calls the token endpoint from its own origin, and a
+        // hard-coded single origin blocked it.
+        var allowedOrigins = builder.Configuration
+            .GetSection("Cors:AllowedOrigins")
+            .Get<string[]>() ?? ["http://localhost:4200"];
+
         options.AddPolicy(
             allowSpecificOrigin,
             corsPolicyBuilder =>
             {
                 corsPolicyBuilder
-                    .WithOrigins("http://localhost:4200")
+                    .WithOrigins(allowedOrigins)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
