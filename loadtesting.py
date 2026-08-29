@@ -20,7 +20,7 @@ def generate_random_email():
 
 def send_signup_request(request_num):
     """Send a single signup request using urllib"""
-    url = "https://localhost:7077/user/sign-up"
+    url = "https://127.0.0.1:7077/user/sign-up"
     
     payload = {
         "password": "password",
@@ -83,4 +83,4 @@ def run_load_test(requests_per_second=100, duration_seconds=10):
     print(f"Total requests sent: {total_requests}")
 
 if __name__ == "__main__":
-    run_load_test(requests_per_second=20, duration_seconds=600)
+    run_load_test(requests_per_second=30, duration_seconds=600)

@@ -31,11 +31,16 @@ public sealed class CreateClientCommandHandler : ICommandHandler<CreateClientCom
             return Result.Failure<Guid>("Client already exists!");
         }
 
+        // An omitted secret registers a public client. Hashing the empty string instead
+        // would store a real hash and make the client look confidential, so it would
+        // then be required to present a secret it was never given.
         var client = new Client
         {
             Id = Guid.NewGuid(),
             ClientId = requestedClient.ClientId,
-            ClientSecret = _securityService.HashSecret(requestedClient.ClientSecret),
+            ClientSecret = string.IsNullOrWhiteSpace(requestedClient.ClientSecret)
+                ? string.Empty
+                : _securityService.HashSecret(requestedClient.ClientSecret),
             RedirectUri = requestedClient.RedirectUri,
         };
 

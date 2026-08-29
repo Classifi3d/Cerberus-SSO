@@ -93,6 +93,15 @@ public class UserController : Controller
             });
         }
 
+        // An OAuth login resolves to a redirect carrying the authorization code, not to
+        // a token. Returning only `token` here dropped that redirect on the floor and
+        // handed the caller a null, which made the authorization code flow impossible
+        // to complete.
+        if (!string.IsNullOrEmpty(loginResult.RedirectUrl))
+        {
+            return Ok(new { redirectUrl = loginResult.RedirectUrl });
+        }
+
         return Ok(new { token = loginResult.Token });
     }
 
@@ -179,7 +188,17 @@ public class UserController : Controller
             return Unauthorized(result.Error);
         }
 
-        return Ok(result);
+        // Mirrors the login endpoint. This used to return the Result wrapper itself,
+        // so callers received {value, isSuccess, isFailure, error} instead of the
+        // payload, and the OAuth redirect was buried a level down.
+        var verification = result.Value;
+
+        if (!string.IsNullOrEmpty(verification.RedirectUrl))
+        {
+            return Ok(new { redirectUrl = verification.RedirectUrl });
+        }
+
+        return Ok(new { token = verification.Token });
     }
 
 }
