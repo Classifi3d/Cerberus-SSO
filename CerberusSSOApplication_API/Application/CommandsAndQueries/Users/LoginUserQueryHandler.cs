@@ -102,8 +102,7 @@ public sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, LoginS
             TimeSpan.FromMinutes(5)
         );
 
-        var redirectUrl =
-            $"{oauthRequest.RedirectUri}?code={code}&state={oauthRequest.State}";
+        var redirectUrl = $"{oauthRequest.RedirectUri}?code={code}&state={oauthRequest.State}";
 
         return Result.Success(new LoginSecurityDTO
         {

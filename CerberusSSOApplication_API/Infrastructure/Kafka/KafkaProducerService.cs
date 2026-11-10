@@ -25,7 +25,7 @@ public class KafkaProducerService
             BatchNumMessages = BATCH_SIZE,
             Acks = Acks.Leader
         };
-        _topic = config["Kafka:Topic"];
+        _topic = config["Kafka:Topic"] ?? "";
         _producer = new ProducerBuilder<Null, byte[]>(producerConfig).Build();
         _logger = logger;
     }
