@@ -1,3 +1,4 @@
+import { When } from "react-if";
 import type { ReactNode } from "react";
 
 interface ILayoutProps {
@@ -12,9 +13,15 @@ export const Layout = ({
   children,
 }: ILayoutProps) => {
   return (
-    <div> toast </div>
-    <div> header </div>
-    {children}
-    <div> footer </div>
+    <div>
+      <div> toast </div>
+      <When condition={!simplified}>
+        <div> header </div>
+      </When>
+      {children}
+      <When condition={!isLoading}>
+        <div> footer </div>
+      </When>
+    </div>
   );
 };

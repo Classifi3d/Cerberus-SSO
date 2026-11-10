@@ -1,7 +1,64 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react';
 import './Grainient.css';
+
+export type GrainientType = 'linear' | 'radial';
+
+export interface GrainientProps extends Omit<HTMLAttributes<HTMLDivElement>, 'style'> {
+  colors?: string[];
+  type?: GrainientType;
+  angle?: number;
+  bands?: number;
+  speed?: number;
+  flow?: number;
+  scale?: number;
+  softness?: number;
+  silk?: number;
+  grainAmount?: number;
+  grainSize?: number;
+  grainAnimated?: boolean;
+  contrast?: number;
+  saturation?: number;
+  variation?: number;
+  interactive?: boolean;
+  stir?: number;
+  clickSwirl?: boolean;
+  intro?: boolean;
+  lightMode?: boolean;
+  dpr?: number;
+  style?: CSSProperties;
+}
+
+type Settings = {
+  colors: string[];
+  type: number;
+  angle: number;
+  bands: number;
+  speed: number;
+  flow: number;
+  scale: number;
+  softness: number;
+  silk: number;
+  grainAmount: number;
+  grainSize: number;
+  grainAnimated: boolean;
+  contrast: number;
+  saturation: number;
+  variation: number;
+  interactive: boolean;
+  stir: number;
+  clickSwirl: boolean;
+  intro: boolean;
+  lightMode: boolean;
+  dpr?: number;
+};
+
+type Sample = { x: number; y: number; vx: number; vy: number; age: number; grow: number; done: boolean };
+
+type Spin = { x: number; y: number; age: number; direction: number };
+
+type Program = { program: WebGLProgram; uniforms: Record<string, WebGLUniformLocation | null> };
 
 const MAX_COLORS = 8;
 const MAX_STIRS = 24;
@@ -11,7 +68,7 @@ const STIR_STEP = 0.06;
 const TWIRL_LIFE = 2.6;
 const INTRO_SECONDS = 1.6;
 const DEFAULT_COLORS = ['#120f17', '#2a0f0a', '#9a3412', '#f97316', '#fed7aa'];
-const TYPES = { linear: 0, radial: 1 };
+const TYPES: Record<string, number> = { linear: 0, radial: 1 };
 const LIFT = 0.2;
 
 const VERTEX = `#version 300 es
@@ -199,11 +256,11 @@ void main() {
   outColor = vec4(clamp(color, 0.0, 1.0), 1.0);
 }`;
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-const toLinear = value => (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+const toLinear = (value: number) => (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
 
-const toLab = ([r, g, b]) => {
+const toLab = ([r, g, b]: number[]): number[] => {
   const lr = toLinear(r);
   const lg = toLinear(g);
   const lb = toLinear(b);
@@ -217,7 +274,7 @@ const toLab = ([r, g, b]) => {
   ];
 };
 
-const compile = (gl, type, source) => {
+const compile = (gl: WebGL2RenderingContext, type: number, source: string) => {
   const shader = gl.createShader(type);
   if (!shader) return null;
   gl.shaderSource(shader, source);
@@ -227,7 +284,7 @@ const compile = (gl, type, source) => {
   return null;
 };
 
-const link = (gl, fragmentSource) => {
+const link = (gl: WebGL2RenderingContext, fragmentSource: string): Program | null => {
   const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX);
   const fragment = compile(gl, gl.FRAGMENT_SHADER, fragmentSource);
   const program = gl.createProgram();
@@ -241,7 +298,7 @@ const link = (gl, fragmentSource) => {
     gl.deleteProgram(program);
     return null;
   }
-  const uniforms = {};
+  const uniforms: Record<string, WebGLUniformLocation | null> = {};
   const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
   for (let i = 0; i < count; i++) {
     const info = gl.getActiveUniform(program, i);
@@ -277,12 +334,12 @@ const Grainient = ({
   className = '',
   style,
   ...rest
-}) => {
-  const containerRef = useRef(null);
-  const canvasRef = useRef(null);
-  const wakeRef = useRef(null);
+}: GrainientProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wakeRef = useRef<(() => void) | null>(null);
   const palette = (Array.isArray(colors) && colors.length ? colors : DEFAULT_COLORS).slice(0, MAX_COLORS);
-  const settings = {
+  const settings: Settings = {
     colors: palette.length > 1 ? palette : [palette[0], palette[0]],
     type: TYPES[type] ?? 0,
     angle,
@@ -335,8 +392,8 @@ const Grainient = ({
     const fieldSize = { width: 0, height: 0 };
 
     const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
-    const colorCache = new Map();
-    const parse = value => {
+    const colorCache = new Map<string, number[]>();
+    const parse = (value: string): number[] => {
       const key = String(value);
       const cached = colorCache.get(key);
       if (cached) return cached;
@@ -359,8 +416,8 @@ const Grainient = ({
     const stirs = new Float32Array(MAX_STIRS * 4);
     const stirWeights = new Float32Array(MAX_STIRS);
     const twirls = new Float32Array(MAX_TWIRLS * 4);
-    const trail = [];
-    const spins = [];
+    const trail: Sample[] = [];
+    const spins: Spin[] = [];
     const pointer = { x: 0.5, y: 0.5, sx: 0.5, sy: 0.5, vx: 0, inside: false, fresh: true };
     let paletteKey = '';
     let time = 0;
@@ -383,7 +440,7 @@ const Grainient = ({
         const blank = labs.map(([L]) => Math.abs(L - labs[0][0]) < 0.1);
         const tints = labs.filter((_, i) => !blank[i]).reverse();
         labs.forEach((_, i) => {
-          const [L, a, b] = blank[i] ? [1, 0, 0] : tints.shift();
+          const [L, a, b] = blank[i] ? [1, 0, 0] : (tints.shift() as number[]);
           ramp.set([L + (1 - L) * LIFT, a * (1 - LIFT), b * (1 - LIFT)], i * 3);
         });
       }
@@ -454,7 +511,7 @@ const Grainient = ({
       wake();
     };
 
-    const updateTouches = (dt, aspect) => {
+    const updateTouches = (dt: number, aspect: number) => {
       const s = settingsRef.current;
       const follow = 1 - Math.exp(-dt / 0.06);
       const px = pointer.sx;
@@ -511,7 +568,7 @@ const Grainient = ({
       }
     };
 
-    const frame = now => {
+    const frame = (now: number) => {
       raf = 0;
       if (!visible || document.hidden) return;
       const s = settingsRef.current;
@@ -536,7 +593,7 @@ const Grainient = ({
       if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame);
     }
 
-    const locate = event => {
+    const locate = (event: PointerEvent) => {
       const rect = container.getBoundingClientRect();
       const x = (event.clientX - rect.left) / Math.max(1, rect.width);
       const y = 1 - (event.clientY - rect.top) / Math.max(1, rect.height);
@@ -550,12 +607,12 @@ const Grainient = ({
       }
     };
 
-    const onPointerMove = event => {
+    const onPointerMove = (event: PointerEvent) => {
       locate(event);
       if (pointer.inside || trail.length) wake();
     };
 
-    const onPointerDown = event => {
+    const onPointerDown = (event: PointerEvent) => {
       locate(event);
       const s = settingsRef.current;
       if (!pointer.inside || !s.clickSwirl || reduce) return;

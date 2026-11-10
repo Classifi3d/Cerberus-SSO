@@ -1,0 +1,13 @@
+.grainient-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.grainient-container {
+  position: absolute; /* Change from relative to absolute */
+  inset: 0; /* Locks it to all edges of the parent wrapper */
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}

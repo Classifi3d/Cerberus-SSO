@@ -4,6 +4,6 @@ import { Router } from "@/app/routing/Router";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Router></Router>
+    <Router />
   </StrictMode>,
 );
