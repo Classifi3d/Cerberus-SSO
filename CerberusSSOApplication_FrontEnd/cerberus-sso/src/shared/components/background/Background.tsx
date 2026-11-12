@@ -1,12 +1,14 @@
-import GradientASCII from "@/ui/GradientASCII";
-import Grainient from "@/ui/Grainient";
-import "./Background.css";
+import type { JSX } from "react/jsx-runtime";
 
-export const Background: React.FC = () => {
+import Grainient from "@/shared/ui/Grainient";
+
+import styles from "./background.module.scss";
+
+export const Background = (): JSX.Element => {
   return (
-    <div className="app-background">
+    <div className={styles["app-background"]}>
       <Grainient
-        className="app-background__grainient"
+        className={styles["app-background__grainient"]}
         colors={["#2f0b04", "#681a0c", "#9a3412", "#f97316", "#fed7aa"]}
         angle={58}
         flow={1.35}
@@ -22,7 +24,7 @@ export const Background: React.FC = () => {
         clickSwirl={false}
         intro={false}
       />
-        {/* <GradientASCII
+      {/* <GradientASCII
           colors={["#7b1c28","#ea7849","#dfb483","#ca5f44"]}
           shape="horizon"
           characters=" 01"

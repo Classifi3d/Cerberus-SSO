@@ -1,26 +1,40 @@
+import type { JSX, ReactNode } from "react";
 import { When } from "react-if";
-import type { ReactNode } from "react";
+
+import { Header } from "@/shared/components/layout/header/Header";
+
+import { Background } from "../background/Background";
+import { ToastContainer } from "../toast/ToastContainer";
+import { Footer } from "./footer/Footer";
+import styles from "./layout.module.scss";
 
 interface ILayoutProps {
-  simplified?: boolean;
+  hasBackground?: boolean;
+  hasHeader?: boolean;
+  hasFooter?: boolean;
   isLoading?: boolean;
   children: ReactNode;
 }
 
 export const Layout = ({
-  simplified = false,
+  hasBackground = true,
+  hasHeader = true,
+  hasFooter = true,
   isLoading = false,
   children,
-}: ILayoutProps) => {
+}: ILayoutProps): JSX.Element => {
   return (
-    <div>
-      <div> toast </div>
-      <When condition={!simplified}>
-        <div> header </div>
+    <div className={styles.layout}>
+      <When condition={hasBackground}>
+        <Background />
+      </When>
+      <ToastContainer />
+      <When condition={hasHeader}>
+        <Header />
       </When>
       {children}
-      <When condition={!isLoading}>
-        <div> footer </div>
+      <When condition={hasFooter}>
+        <Footer />
       </When>
     </div>
   );

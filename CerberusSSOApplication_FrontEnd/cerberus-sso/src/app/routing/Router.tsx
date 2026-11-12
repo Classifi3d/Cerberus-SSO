@@ -1,6 +1,9 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 
+import { Layout } from "@/shared/components/layout/Layout";
+import { SpinnerContainer } from "@/shared/components/spinner/SpinnerContainer";
+
 const routes = {
   login: "/login",
   loginMfa: "login/mfa",
@@ -10,14 +13,18 @@ const routes = {
 };
 
 const LoginPage = React.lazy(() =>
-  import("@/features/login/pages/LoginPage").then((module) => ({
-    default: module.LoginPage,
-  })),
+  import("@/features/login/pages/LoginPage").then((module) => ({ default: module.LoginPage })),
 );
 
 export const Router = () => (
   <BrowserRouter>
-    <React.Suspense fallback={<div>Loading ...</div>}>
+    <React.Suspense
+      fallback={
+        <Layout>
+          <SpinnerContainer />
+        </Layout>
+      }
+    >
       <Routes>
         <Route path={routes.login} element={<LoginPage />} />
         <Route path={routes.loginMfa} element={<LoginPage />} />
