@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
 namespace Presentation.Configurations;
 
 public static class RateLimiterExtension
 {
-    public static IServiceCollection AddCustomRateLimiters( this IServiceCollection services )
+    public static IServiceCollection AddCustomRateLimiters(this IServiceCollection services)
     {
         services.AddRateLimiter(options =>
         {

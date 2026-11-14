@@ -1,4 +1,4 @@
-﻿using Confluent.Kafka;
+using Confluent.Kafka;
 using Infrastructure.Outbox;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,7 +15,7 @@ public class KafkaProducerService
     private const int BATCH_SIZE = 1000;
 
     public KafkaProducerService(
-        IConfiguration config, 
+        IConfiguration config,
         ILogger<KafkaProducerService> logger)
     {
         var producerConfig = new ProducerConfig

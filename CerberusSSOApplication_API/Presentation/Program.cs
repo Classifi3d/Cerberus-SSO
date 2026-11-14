@@ -1,15 +1,15 @@
-using Presentation.Configurations;
-using Presentation.Extensions;
+using Application.Extensions;
+using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Presentation.Configurations;
+using Presentation.Extensions;
 using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Text;
-using Application.Extensions;
-using Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,12 +58,12 @@ builder
         };
     });
 
-    //.AddJwtBearer(options =>
-    // {
-    //     options.Authority = "https://localhost:5000"; // My SSO
-    //     options.Audience = "demo_client";
-    //     options.RequireHttpsMetadata = false;
-    // });
+//.AddJwtBearer(options =>
+// {
+//     options.Authority = "https://localhost:5000"; // My SSO
+//     options.Audience = "demo_client";
+//     options.RequireHttpsMetadata = false;
+// });
 
 // Cross-Origin Resource Sharing
 var allowSpecificOrigin = "_myAllowSpecificOrigins";

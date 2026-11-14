@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -7,9 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
-    <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
-    <PackageReference Include="Scrutor" Version="7.0.0" />
+    <PackageReference Include="CSharpFunctionalExtensions" />
+    <PackageReference Include="MailKit" />
+    <PackageReference Include="Riok.Mapperly" />
+    <PackageReference Include="Scrutor" />
   </ItemGroup>
 
   <ItemGroup>
