@@ -18,7 +18,7 @@ export const LoginForm = (): JSX.Element => {
 
   return (
     <div className={styles.login_card}>
-      <Title className={styles.title}>Sign in</Title>
+      <Title className={styles.title}>Sign In</Title>
       <form className={styles.form} onSubmit={handleSubmit}>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -26,10 +26,11 @@ export const LoginForm = (): JSX.Element => {
             id="email"
             type="email"
             name="email"
-            // autoComplete="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            // required
+            placeholder="user@mail.com"
+            required
           />
         </Field>
         <Field>
@@ -41,6 +42,7 @@ export const LoginForm = (): JSX.Element => {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="P@s5w0rd"
             required
           />
         </Field>

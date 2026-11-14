@@ -1,0 +1,24 @@
+@import './abstracts/variables';
+@import './abstracts/mixins';
+
+// Font face declarations
+@font-face {
+  font-family: 'HoldMoney';
+  src: url('/src/assets/fonts/HoldMoney-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Guplax';
+  src: url('/src/assets/fonts/Guplax-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Asah';
+  src: url('/src/assets/fonts/Asah.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}

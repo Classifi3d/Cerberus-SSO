@@ -9,7 +9,8 @@ export const Background = (): JSX.Element => {
     <div className={styles["app-background"]}>
       <Grainient
         className={styles["app-background__grainient"]}
-        colors={["#2f0b04", "#681a0c", "#9a3412", "#f97316", "#fed7aa"]}
+        // colors={["#2f0b04", "#681a0c", "#9a3412", "#f97316", "#fed7aa"]}
+        colors={["#2f0b04", "#640b0b", "rgb(156, 42, 22)", "#f97316", "#fecaaa"]}
         angle={58}
         flow={1.35}
         silk={0.52}

@@ -40,4 +40,26 @@
   }
 }
 
-// mixin for font
+// Font face mixins
+@mixin font-face($font-name, $font-file, $font-weight: 400, $font-style: normal) {
+  @font-face {
+    font-family: $font-name;
+    src: url($font-file) format('truetype');
+    font-weight: $font-weight;
+    font-style: $font-style;
+  }
+}
+
+// Font family shortcuts
+@mixin font-holdmoney {
+  font-family: 'HoldMoney', sans-serif;
+  font-weight: 800;
+}
+
+@mixin font-guplax {
+  font-family: 'Guplax', sans-serif;
+}
+
+@mixin font-asah {
+  font-family: 'Asah', sans-serif;
+}

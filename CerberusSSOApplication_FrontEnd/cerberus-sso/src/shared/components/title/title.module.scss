@@ -1,7 +1,7 @@
 @use "../../styles/abstracts/mixins" as *;
 
 .title {
-  //@include font;
+  @include font-holdmoney;
 
   &.h1 {
     font-size: 40px;
