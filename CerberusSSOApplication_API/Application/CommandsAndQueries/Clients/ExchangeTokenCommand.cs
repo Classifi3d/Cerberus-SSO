@@ -44,13 +44,10 @@ public sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenC
             return Result.Failure<TokenResponseDTO>("Invalid client");
         }
 
-        var validSecret = _securityService.CheckSecret(req.ClientSecret, client.ClientSecret);
-        if (!validSecret)
-        {
-            return Result.Failure<TokenResponseDTO>("Invalid client credentials");
-        }
-
-        var cached = await _cacheService.GetAsync<dynamic>($"auth_code_{req.Code}");
+        // Typed rather than dynamic: the cache deserializes to a JsonElement, and every
+        // member access on it through `dynamic` threw at runtime instead of reading the
+        // stored code.
+        var cached = await _cacheService.GetAsync<AuthorizationCodeDTO>($"auth_code_{req.Code}");
         if (cached is null) {
             return Result.Failure<TokenResponseDTO>("Invalid or expired code");
         }
@@ -59,11 +56,58 @@ public sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenC
         {
             return Result.Failure<TokenResponseDTO>("Invalid code for this client");
         }
-        
-        // OPTIONAL_TODO: validate redirect_uri if you stored it
 
-        Guid userId = Guid.Parse((string)cached.UserId);
-        var accessToken = _tokenService.GenerateAccessToken(userId, req.ClientId);
+        // A public client proves possession with PKCE; a confidential one with its
+        // secret. Which applies is decided by how the client is registered, never by
+        // what the caller chose to send.
+        var isPublicClient = string.IsNullOrEmpty(client.ClientSecret);
+
+        if (isPublicClient)
+        {
+            if (!Pkce.Verify(req.CodeVerifier, cached.CodeChallenge))
+            {
+                return Result.Failure<TokenResponseDTO>("Invalid code_verifier");
+            }
+        }
+        else
+        {
+            if (!_securityService.CheckSecret(req.ClientSecret ?? string.Empty, client.ClientSecret))
+            {
+                return Result.Failure<TokenResponseDTO>("Invalid client credentials");
+            }
+
+            // Confidential clients may still use PKCE; honour the challenge if one was
+            // registered with the code.
+            if (!string.IsNullOrWhiteSpace(cached.CodeChallenge) &&
+                !Pkce.Verify(req.CodeVerifier, cached.CodeChallenge))
+            {
+                return Result.Failure<TokenResponseDTO>("Invalid code_verifier");
+            }
+        }
+
+        // RFC 6749 section 4.1.3: the redirect uri must match the one the code was
+        // issued for.
+        if (!string.IsNullOrWhiteSpace(cached.RedirectUri) &&
+            !string.Equals(cached.RedirectUri, req.RedirectUri, StringComparison.Ordinal))
+        {
+            return Result.Failure<TokenResponseDTO>("redirect_uri does not match the authorization request");
+        }
+
+        if (!Guid.TryParse(cached.UserId, out var userId))
+        {
+            return Result.Failure<TokenResponseDTO>("The authorization code references an unusable user id");
+        }
+
+        // Name and email are stamped into the token so a relying party can show who is
+        // signed in without a second round trip to the user endpoint.
+        var user = await _unitOfWork.Repository<Domain.Entities.User.User>()
+            .GetByIdAsync(userId, cancellationToken);
+
+        var accessToken = _tokenService.GenerateAccessToken(
+            userId,
+            req.ClientId,
+            user?.Username,
+            user?.Email);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
         await _cacheService.RemoveAsync($"auth_code_{req.Code}");

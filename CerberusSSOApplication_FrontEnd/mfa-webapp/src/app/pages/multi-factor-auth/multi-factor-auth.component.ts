@@ -61,7 +61,7 @@ export class MultiFactorAuthComponent {
 			console.log('Invalid PIN code');
 		}
 
-		const challengeId = localStorage.getItem('Challange-Token');
+		const challengeId = localStorage.getItem('Challenge-Token');
 		if (!!challengeId) {
 			const mfaVerificationDto: MfaVerificationDto = {
 				challengeId: challengeId,
@@ -70,14 +70,22 @@ export class MultiFactorAuthComponent {
 			console.log(mfaVerificationDto);
 			this.apiService.verifyMfaCode(mfaVerificationDto).subscribe({
 				next: (res) => {
-					console.log('MFA verified successfully:', res);
+					localStorage.removeItem('Challenge-Token');
+
+					// Same as the login page: when this verification completes another
+					// application's OAuth flow, the result is a redirect carrying the
+					// authorization code rather than a token of our own.
+					if (!!res.redirectUrl) {
+						window.location.href = res.redirectUrl;
+						return;
+					}
+
 					const oAuthToken = res.token;
 					if (!!oAuthToken) {
-						console.log(oAuthToken);
 						localStorage.setItem('OAuth-Token', oAuthToken);
 						this.router.navigate(['/user-menu']);
 					} else {
-						console.error('Error generting OAuth Token');
+						console.error('No token or redirect in the MFA response');
 						this.error = 'Invalid PIN!';
 					}
 				},

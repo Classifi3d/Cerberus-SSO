@@ -127,7 +127,7 @@ public class KafkaConsumerService : BackgroundService
                 await projector.ProjectAsync(payload, CancellationToken.None);
 
                 processedSinceCommit++;
-                if ((processedSinceCommit >= BATCH_SIZE) ||
+                if (processedSinceCommit >= BATCH_SIZE ||
                     (DateTime.UtcNow - lastCommitTime) >= TimeSpan.FromSeconds(CONSUMER_PROCESS_FREQUENCY))
                 {
                     try
