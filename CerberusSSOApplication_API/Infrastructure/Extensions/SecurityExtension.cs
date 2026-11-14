@@ -8,7 +8,12 @@ public static class SecurityExtension
     public static IServiceCollection AddSecurityServices(this IServiceCollection services)
     {
         services.AddScoped<ISecurityService, SecurityService>();
-        services.AddScoped<ITokenService, TokenService>();
+
+        services.AddSingleton<IOAuthSettings, OAuthSettings>();
+
+        // Singleton, not scoped: the service owns the signing key, and resolving a new
+        // one per request is what produced a fresh keypair on every call.
+        services.AddSingleton<ITokenService, TokenService>();
 
         return services;
     }

@@ -26,9 +26,29 @@ export class ApiService {
 	private paramsUsers = new HttpParams();
 
 	// ========== LOGIN ==========
-	public loginUser(user: User): Observable<any> {
-		return this.http.post<any>(`${this.url}/user/login`, user, {
-			headers: this.getAuthHeaders(),
+	/**
+	 * Signs a user in.
+	 *
+	 * `requestId` is present when this page was opened as the authorization step of
+	 * another application's OAuth flow - Cerberus redirects here with it after
+	 * /OAuth/authorize. Passing it back is what lets the server mint an authorization
+	 * code for that client instead of a plain session token.
+	 *
+	 * Plain headers, not getAuthHeaders(): this endpoint is anonymous, and there is by
+	 * definition no token yet, so the latter sent a literal `Bearer null`.
+	 */
+	public loginUser(user: User, requestId?: string | null): Observable<any> {
+		const body: Record<string, unknown> = {
+			email: user.email,
+			password: user.password,
+		};
+
+		if (requestId) {
+			body['requestId'] = requestId;
+		}
+
+		return this.http.post<any>(`${this.url}/user/login`, body, {
+			headers: this.headers,
 		});
 	}
 

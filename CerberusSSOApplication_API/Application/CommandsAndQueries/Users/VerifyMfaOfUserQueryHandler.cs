@@ -93,7 +93,9 @@ public sealed class VerifyMfaOfUserQueryHandler : IQueryHandler<VerifyMfaOfUserQ
             new AuthorizationCodeDTO
             {
                 UserId = user.Id.ToString(),
-                ClientId = oauthRequest.ClientId
+                ClientId = oauthRequest.ClientId,
+                CodeChallenge = oauthRequest.CodeChallenge,
+                RedirectUri = oauthRequest.RedirectUri
             },
             TimeSpan.FromMinutes(5)
         );

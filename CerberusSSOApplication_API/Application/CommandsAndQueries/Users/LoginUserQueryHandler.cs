@@ -87,14 +87,22 @@ public sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, LoginS
         // Generate authorization code
         var code = Guid.NewGuid().ToString();
 
+        // The challenge and redirect uri travel with the code so the token exchange can
+        // verify them against what was actually authorized, not against what the caller
+        // re-sends.
         await _cacheService.SetAsync(
             $"auth_code_{code}",
-            new AuthorizationCodeDTO { UserId = user.Id, ClientId = oauthRequest.ClientId },
+            new AuthorizationCodeDTO
+            {
+                UserId = user.Id,
+                ClientId = oauthRequest.ClientId,
+                CodeChallenge = oauthRequest.CodeChallenge,
+                RedirectUri = oauthRequest.RedirectUri
+            },
             TimeSpan.FromMinutes(5)
         );
 
-        var redirectUrl =
-            $"{oauthRequest.RedirectUri}?code={code}&state={oauthRequest.State}";
+        var redirectUrl = $"{oauthRequest.RedirectUri}?code={code}&state={oauthRequest.State}";
 
         return Result.Success(new LoginSecurityDTO
         {
