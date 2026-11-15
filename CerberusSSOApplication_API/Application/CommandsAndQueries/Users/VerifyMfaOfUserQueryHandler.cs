@@ -1,4 +1,4 @@
-﻿
+
 using Application.Abstraction;
 using Application.Abstraction.CQRS;
 using Application.Abstraction.Services;
@@ -100,8 +100,7 @@ public sealed class VerifyMfaOfUserQueryHandler : IQueryHandler<VerifyMfaOfUserQ
             TimeSpan.FromMinutes(5)
         );
 
-        var redirectUrl =
-            $"{oauthRequest.RedirectUri}?code={code}&state={oauthRequest.State}";
+        var redirectUrl = $"{oauthRequest.RedirectUri}?code={code}&state={oauthRequest.State}";
 
         await _cacheService.RemoveAsync($"mfa_challenge_{requestId}");
 

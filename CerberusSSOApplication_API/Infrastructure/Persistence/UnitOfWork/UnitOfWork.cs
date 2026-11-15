@@ -1,7 +1,7 @@
-﻿using Infrastructure.Persistence.Repository;
-using Infrastructure.Outbox;
-using Microsoft.EntityFrameworkCore;
 using Application.Abstraction;
+using Infrastructure.Outbox;
+using Infrastructure.Persistence.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.UnitOfWork;
 
@@ -39,15 +39,15 @@ public sealed class UnitOfWork<TContext> : IUnitOfWork, IDisposable
     {
         if (_pendingOutboxEvents.Count > 0)
         {
-            foreach (var evt in _pendingOutboxEvents)
+            foreach (var outboxEvent in _pendingOutboxEvents)
             {
-                var msg = new OutboxMessage
+                var message = new OutboxMessage
                 {
-                    Type = evt.GetType().Name,
-                    Payload = MessagePack.MessagePackSerializer.Serialize(evt, null, cancellationToken)
+                    Type = outboxEvent.GetType().Name,
+                    Payload = MessagePack.MessagePackSerializer.Serialize(outboxEvent, null, cancellationToken)
                 };
 
-                _dbContext.Set<OutboxMessage>().Add(msg);
+                _dbContext.Set<OutboxMessage>().Add(message);
             }
 
             _pendingOutboxEvents.Clear();

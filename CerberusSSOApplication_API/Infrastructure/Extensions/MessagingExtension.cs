@@ -1,4 +1,4 @@
-﻿
+
 using Domain.Entities.User;
 using Infrastructure.Kafka;
 using Infrastructure.Outbox;
@@ -18,7 +18,7 @@ public static class MessagingExtension
             .WithResolver(MessagePack.Resolvers.ContractlessStandardResolver.Instance);
 
         // Sender 
-        services.AddSingleton<KafkaProducerService>();
+        services.AddSingleton<KafkaOutboxEventProducer>();
         services.AddSingleton<OutboxProcessorService>();
         services.AddHostedService(sp => sp.GetRequiredService<OutboxProcessorService>());
 
@@ -30,7 +30,7 @@ public static class MessagingExtension
 
 
         // Receiver 
-        services.AddHostedService<KafkaConsumerService>();
+        services.AddHostedService<KafkaOutboxConsumerService>();
         services.AddScoped<UserUpsertProjector>();
         services.AddScoped<UserDeleteProjector>();
 
@@ -44,5 +44,4 @@ public static class MessagingExtension
 
         return services;
     }
-
 }

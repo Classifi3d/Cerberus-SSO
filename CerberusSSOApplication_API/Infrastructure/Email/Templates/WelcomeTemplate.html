@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Verify your account</title>
+
+  <style>
+    /*
+      Custom brand font. For this to load in a recipient's mail client the src
+      must be an absolute, publicly hosted URL - a relative path only works in
+      local previews. Clients that block web fonts fall back to the stack below.
+    */
+    @font-face {
+      font-family: 'HoldMoney';
+      src: url('HoldMoney-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+    }
+  </style>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #3d0a06 0%, #8f1a10 45%, #c1440e 75%, #e07b39 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #111827;
+    }
+    .wrapper {
+      width: 100%;
+      padding: 48px 16px;
+    }
+    .card {
+      max-width: 420px;
+      margin: 0 auto;
+      background-color: #c9ccd1;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    }
+    .header {
+      padding: 36px 32px 8px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-family: 'HoldMoney', 'Old English Text MT', 'UnifrakturMaguntia', serif;
+      font-size: 34px;
+      font-weight: 400;
+      color: #0d1117;
+      letter-spacing: 0.5px;
+    }
+    .body {
+      padding: 16px 32px 36px;
+    }
+    .greeting {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 12px;
+      color: #111827;
+    }
+    .text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0 0 16px;
+    }
+    .field-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #111827;
+      margin: 16px 0 6px;
+    }
+    .field-box {
+      background-color: #b9bdc4;
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #4b5563;
+    }
+    .code-box {
+      background-color: #b9bdc4;
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      color: #0d1117;
+      margin: 6px 0 4px;
+    }
+    .code-expiry {
+      font-size: 12px;
+      color: #6b7280;
+      margin: 8px 0 0;
+    }
+    .cta {
+      text-align: center;
+      margin: 28px 0 0;
+    }
+    .cta a {
+      display: block;
+      background-color: #0d1117;
+      color: #e5e7eb;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 14px 0;
+      border-radius: 8px;
+    }
+    .footer {
+      padding: 20px 32px 28px;
+      text-align: center;
+      font-size: 11px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card">
+
+      <div class="header">
+        <h1>Welcome</h1>
+      </div>
+
+      <div class="body">
+        <p class="greeting">Hi {{Name}},</p>
+        <p class="text">
+          Your Cerberus SSO account has been created. To finish setting it up,
+          verify your email address with the code below.
+        </p>
+
+        <p class="field-label">Email</p>
+        <div class="field-box">{{Email}}</div>
+
+        <p class="field-label">Verification code</p>
+        <div class="code-box">{{VerificationCode}}</div>
+        <p class="code-expiry">This code expires in {{CodeExpiryMinutes}} minutes.</p>
+
+        <p class="text" style="margin-top: 20px;">
+          If you didn't create this account, you can safely ignore this email -
+          the address will stay unverified.
+        </p>
+
+        <div class="cta">
+          <a href="{{ActionUrl}}">Next</a>
+        </div>
+      </div>
+
+      <div class="footer">
+        &copy; {{Year}} Cerberus SSO. All rights reserved.<br />
+        This is an automated message - please do not reply.
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

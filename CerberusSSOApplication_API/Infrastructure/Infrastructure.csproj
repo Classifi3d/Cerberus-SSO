@@ -33,4 +33,8 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Email\Templates\*.html" />
+  </ItemGroup>
+
 </Project>

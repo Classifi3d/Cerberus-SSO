@@ -108,6 +108,7 @@ builder.Services.AddExceptionHandlers();
 
 builder.Services.AddApplicationServices();
 builder.Services.AddMessagingServices();
+builder.Services.AddEmailMessagingServices(builder.Configuration);
 builder.Services.AddSecurityServices();
 
 builder.AddCachingServices();

@@ -1,5 +1,5 @@
-﻿using Infrastructure.Persistence.Context;
 using Infrastructure.Kafka;
+using Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,13 +16,13 @@ public class OutboxProcessorService : BackgroundService
     private const int THREAD_COUNT = 4;
 
     private readonly IServiceProvider _serviceProvider;
-    private readonly KafkaProducerService _kafka;
+    private readonly KafkaOutboxEventProducer _kafka;
     private readonly AsyncAutoResetEvent _signal = new(false);
     private readonly ILogger<OutboxProcessorService> _logger;
 
     public OutboxProcessorService(
         IServiceProvider serviceProvider,
-        KafkaProducerService kafka,
+        KafkaOutboxEventProducer kafka,
         ILogger<OutboxProcessorService> logger)
     {
         _serviceProvider = serviceProvider;
@@ -69,9 +69,9 @@ public class OutboxProcessorService : BackgroundService
                 """)
             .ToListAsync(cancellationToken);
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            _logger.LogError(e, "Failed querying outbox messages");
+            _logger.LogError(exception, "Failed querying outbox messages");
             return;
         }
 
@@ -83,27 +83,27 @@ public class OutboxProcessorService : BackgroundService
 
         // Publish concurrently
         var successIds = new ConcurrentBag<Guid>();
-        var sem = new SemaphoreSlim(THREAD_COUNT);
-        var produceTasks = outboxMessages.Select(async msg =>
+        var semaphore = new SemaphoreSlim(THREAD_COUNT);
+        var produceTasks = outboxMessages.Select(async message =>
         {
-            await sem.WaitAsync(cancellationToken);
+            await semaphore.WaitAsync(cancellationToken);
             try
             {
                 try
                 {
-                    await _kafka.ProduceAsync(msg);
-                    successIds.Add(msg.Id);
+                    await _kafka.ProduceAsync(message, cancellationToken);
+                    successIds.Add(message.Id);
                     _logger.LogDebug("Outbox message {MessageId} " +
-                        "successfully produced to Kafka", msg.Id);
+                        "successfully produced to Kafka", message.Id);
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
-                    _logger.LogError($"Produce failed for Outbox {msg.Id}: {e.Message}");
+                    _logger.LogError($"Produce failed for Outbox {message.Id}: {exception.Message}");
                 }
             }
             finally
             {
-                sem.Release();
+                semaphore.Release();
             }
         }).ToList();
 
@@ -122,9 +122,9 @@ public class OutboxProcessorService : BackgroundService
 
                 _logger.LogInformation("Marked {Count} outbox messages as processed", producedList.Count);
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                _logger.LogError(e, "Failed updating ProcessedAt for " +
+                _logger.LogError(exception, "Failed updating ProcessedAt for " +
                     "{Count} outbox messages", producedList.Count);
             }
         }
