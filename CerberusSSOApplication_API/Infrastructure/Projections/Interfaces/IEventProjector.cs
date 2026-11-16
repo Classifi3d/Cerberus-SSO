@@ -1,4 +1,5 @@
-﻿namespace Application.Projections.Interfaces;
+namespace Application.Projections.Interfaces;
+
 public interface IEventProjector
 {
     string EventType { get; }
