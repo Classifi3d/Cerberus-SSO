@@ -1,4 +1,5 @@
-﻿namespace Domain.Entities.User;
+namespace Domain.Entities.User;
+
 public class UserUpsertEvent
 {
     public Guid Id { get; set; }

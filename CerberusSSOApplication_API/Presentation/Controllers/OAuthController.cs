@@ -51,7 +51,8 @@ public class OAuthController : Controller
         var command = new AuthorizeClientCommand(request);
         var result = await _mediator.Send<AuthorizeClientCommand, AuthorizeClientResultDTO>(command, cancellationToken);
 
-        if (result.IsFailure) {
+        if (result.IsFailure)
+        {
             return BadRequest(result.Error);
         }
 
@@ -109,7 +110,8 @@ public class OAuthController : Controller
         var command = new CreateClientCommand(request);
         var result = await _mediator.Send<CreateClientCommand, Guid>(command, cancellationToken);
 
-        if (result.IsFailure) {
+        if (result.IsFailure)
+        {
             return BadRequest(result.Error);
         }
 

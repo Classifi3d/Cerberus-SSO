@@ -1,4 +1,4 @@
-﻿using Domain.Entities.User;
+using Domain.Entities.User;
 using Riok.Mapperly.Abstractions;
 
 namespace Application.DTOs;
@@ -10,5 +10,6 @@ public partial class UserMapper
     public partial User ToEntity(UserDTO dto);
     public partial UserUpsertEvent ToUpsertEvent(User user);
     public partial UserDeleteEvent ToDeleteEvent(User user);
-    public partial UserReadModel ToReadModel(UserUpsertEvent @event);
+    public partial UserReadModel ToReadModel(UserUpsertEvent userEvent);
+    public partial UserReadModel ToReadModel(UserDeleteEvent userEvent);
 }

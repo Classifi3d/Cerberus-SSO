@@ -1,15 +1,16 @@
-﻿namespace Infrastructure.Resilience.ChaosEngineering;
+namespace Infrastructure.Resilience.ChaosEngineering;
+
 public class ChaosEngineeringOptions
 {
     public bool Enabled { get; set; }
     public ChaosInboundOptions Inbound { get; set; } = new();
-    public ChaosOutboundOptions Outbound { get; set; } = new(); 
+    public ChaosOutboundOptions Outbound { get; set; } = new();
 
 }
 
 public class ChaosInboundOptions
 {
-    public bool Enabled {  set; get; }
+    public bool Enabled { set; get; }
     public bool HTTPHeaderEnabled { set; get; }
     public double LatencyInjectionRate { set; get; }
     public int LatencyDurationMs { set; get; }

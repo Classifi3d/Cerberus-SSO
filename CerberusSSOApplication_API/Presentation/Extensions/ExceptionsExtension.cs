@@ -1,4 +1,4 @@
-﻿using Presentation.Exceptions.ExceptionHandlers;
+using Presentation.Exceptions.ExceptionHandlers;
 
 namespace Presentation.Extensions;
 

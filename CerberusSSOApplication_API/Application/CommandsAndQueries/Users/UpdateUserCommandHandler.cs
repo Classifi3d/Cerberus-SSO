@@ -1,4 +1,4 @@
-﻿using Application.Abstraction;
+using Application.Abstraction;
 using Application.Abstraction.CQRS;
 using Application.Abstraction.Services;
 using Application.DTOs;
@@ -9,7 +9,7 @@ namespace Application.CommandsAndQueries.Users;
 
 public sealed record UpdateUserCommand(UserDTO User) : ICommand<UserDTO>;
 
-public sealed class UpdateUserCommandHandler : ICommandHandler<UpdateUserCommand,UserDTO>
+public sealed class UpdateUserCommandHandler : ICommandHandler<UpdateUserCommand, UserDTO>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ISecurityService _securityService;
@@ -38,7 +38,7 @@ public sealed class UpdateUserCommandHandler : ICommandHandler<UpdateUserCommand
 
         //user.Email = request.User.Email;
         user.Username = request.User.Username;
-        if(userDto.Password is not null)
+        if (userDto.Password is not null)
         {
             user.Password = _securityService.HashPassword(userDto.Password);
         }
@@ -48,7 +48,7 @@ public sealed class UpdateUserCommandHandler : ICommandHandler<UpdateUserCommand
         var userEvent = _mapper.ToUpsertEvent(user);
         _unitOfWork.AddOutboxEvent(userEvent);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesWithConcurrencyRetryAsync(cancellationToken);
 
         return Result.Success<UserDTO>(request.User);
     }

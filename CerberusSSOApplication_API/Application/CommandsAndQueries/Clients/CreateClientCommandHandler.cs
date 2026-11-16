@@ -1,4 +1,4 @@
-﻿using Application.Abstraction;
+using Application.Abstraction;
 using Application.Abstraction.CQRS;
 using Application.Abstraction.Services;
 using Application.DTOs;
@@ -6,6 +6,7 @@ using CSharpFunctionalExtensions;
 using Domain.Entities.Client;
 
 namespace Application.CommandsAndQueries.Clients;
+
 public sealed record CreateClientCommand(CreateClientRequestDTO clientRequest) : ICommand<Guid>;
 
 public sealed class CreateClientCommandHandler : ICommandHandler<CreateClientCommand, Guid>
@@ -27,7 +28,8 @@ public sealed class CreateClientCommandHandler : ICommandHandler<CreateClientCom
         var existingClient = await _unitOfWork.Repository<Client>()
             .GetByPropertyAsync(c => c.ClientId, requestedClient.ClientId, cancellationToken);
 
-        if (existingClient is not null) {
+        if (existingClient is not null)
+        {
             return Result.Failure<Guid>("Client already exists!");
         }
 

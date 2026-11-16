@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Registry;
@@ -27,7 +27,7 @@ public class ChaosInboundMiddleware
 
         _logger.LogDebug("ChaosMiddleware entered!");
 
-        if(chaosHttpHeadersEnabled && !chaosHeaderPresent)
+        if (chaosHttpHeadersEnabled && !chaosHeaderPresent)
         {
             await _next(httpContext);
             return;

@@ -1,4 +1,4 @@
-﻿using Infrastructure.Resilience.ChaosEngineering;
+using Infrastructure.Resilience.ChaosEngineering;
 using Infrastructure.Resilience.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

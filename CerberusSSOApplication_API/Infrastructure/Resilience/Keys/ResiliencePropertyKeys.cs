@@ -1,7 +1,8 @@
-﻿using Polly;
+using Polly;
 using System.Net;
 
 namespace Infrastructure.Resilience.Keys;
+
 public static class ResiliencePropertyKeys
 {
     // Resilience 

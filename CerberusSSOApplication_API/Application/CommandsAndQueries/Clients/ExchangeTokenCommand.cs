@@ -1,4 +1,4 @@
-﻿using Application.Abstraction;
+using Application.Abstraction;
 using Application.Abstraction.CQRS;
 using Application.Abstraction.Services;
 using Application.DTOs;
@@ -17,9 +17,9 @@ public sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenC
     private readonly ISecurityService _securityService;
 
     public ExchangeTokenCommandHandler(
-        IUnitOfWork unitOfWork, 
-        ICacheService cacheService, 
-        ITokenService tokenService, 
+        IUnitOfWork unitOfWork,
+        ICacheService cacheService,
+        ITokenService tokenService,
         ISecurityService securityService)
     {
         _unitOfWork = unitOfWork;
@@ -40,7 +40,8 @@ public sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenC
         var client = await _unitOfWork.Repository<Client>()
            .GetByPropertyAsync(c => c.ClientId, req.ClientId, cancellationToken);
 
-        if (client is null) {
+        if (client is null)
+        {
             return Result.Failure<TokenResponseDTO>("Invalid client");
         }
 
@@ -48,7 +49,8 @@ public sealed class ExchangeTokenCommandHandler : ICommandHandler<ExchangeTokenC
         // member access on it through `dynamic` threw at runtime instead of reading the
         // stored code.
         var cached = await _cacheService.GetAsync<AuthorizationCodeDTO>($"auth_code_{req.Code}");
-        if (cached is null) {
+        if (cached is null)
+        {
             return Result.Failure<TokenResponseDTO>("Invalid or expired code");
         }
 

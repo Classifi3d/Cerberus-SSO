@@ -1,6 +1,5 @@
-﻿using Infrastructure.Resilience.Keys;
+using Infrastructure.Resilience.Keys;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 using Polly.Timeout;

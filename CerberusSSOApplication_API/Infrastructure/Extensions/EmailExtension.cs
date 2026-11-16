@@ -1,7 +1,6 @@
 using Application.Email.Abstraction;
 using Infrastructure.Email;
 using Infrastructure.Kafka;
-using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

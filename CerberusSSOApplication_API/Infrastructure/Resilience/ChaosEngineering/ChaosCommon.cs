@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Reflection;
 
@@ -8,16 +8,16 @@ public class ChaosCommon
 {
     public const string CHAOS_ENABLED = "X-Chaos-Enabled";
     public const string CHAOS_LATENCY_INJECTION_RATE = "X-Chaos-Latency-Injection-Rate";
-    public const string CHAOS_LATENCY_DURATION_MS= "X-Chaos-Latency-Duration-Ms";
-    public const string CHAOS_FAULT_INJECTION_RATE= "X-Chaos-Fault-Injection-Rate";
-    public const string CHAOS_FAULT_EXCEPTION= "X-Chaos-Fault-Exception";
+    public const string CHAOS_LATENCY_DURATION_MS = "X-Chaos-Latency-Duration-Ms";
+    public const string CHAOS_FAULT_INJECTION_RATE = "X-Chaos-Fault-Injection-Rate";
+    public const string CHAOS_FAULT_EXCEPTION = "X-Chaos-Fault-Exception";
 
     public static T GetPropertyFromHttpHeader<T>(HttpContext httpContext, string headerKey)
         where T : IParsable<T>
     {
         if (httpContext.Request.Headers.TryGetValue(headerKey, out var headerValue) && T.TryParse(headerValue!, null, out var result))
         {
-            return result;   
+            return result;
         }
 
         return default!;
@@ -35,7 +35,7 @@ public class ChaosCommon
 
         try
         {
-            return (Exception) Activator.CreateInstance(exceptionType!, "Chaos Injected Exception!");
+            return (Exception)Activator.CreateInstance(exceptionType!, "Chaos Injected Exception!");
         }
         catch
         {

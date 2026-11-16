@@ -1,4 +1,4 @@
-﻿using Application.Abstraction.CQRS;
+using Application.Abstraction.CQRS;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;

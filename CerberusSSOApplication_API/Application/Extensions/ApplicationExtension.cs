@@ -1,9 +1,7 @@
-﻿using Application.Abstraction;
+using Application.Abstraction;
 using Application.Abstraction.CQRS;
-using Application.CommandsAndQueries.Users;
 using Application.DTOs;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace Application.Extensions;
 

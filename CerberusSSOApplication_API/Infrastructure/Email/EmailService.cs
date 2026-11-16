@@ -1,7 +1,7 @@
 using Application.Email.Abstraction;
 using Application.Email.Contracts;
 
-namespace Infrastructure.Services;
+namespace Infrastructure.Email;
 
 public class EmailService : IEmailService
 {

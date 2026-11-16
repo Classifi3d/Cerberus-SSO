@@ -1,4 +1,4 @@
-﻿using Infrastructure.Resilience.Keys;
+using Infrastructure.Resilience.Keys;
 using Microsoft.AspNetCore.Http;
 using Polly;
 using System.Net;
@@ -8,12 +8,12 @@ namespace Infrastructure.Resilience.ChaosEngineering;
 public class ChaosContext
 {
     public bool Enabled { get; init; }
-    public double LatencyInjectionRate {  get; init; }
-    public TimeSpan LatencyDuration {  get; init; }
-    public double FaultInjectionRate {  get; init; }
-    public Exception FaultException { get; init;  }
-    public  double OutcomeInjectionRate { get; init; }
-    public HttpStatusCode OutcomeHttpStatusCode { get; init; } 
+    public double LatencyInjectionRate { get; init; }
+    public TimeSpan LatencyDuration { get; init; }
+    public double FaultInjectionRate { get; init; }
+    public Exception FaultException { get; init; }
+    public double OutcomeInjectionRate { get; init; }
+    public HttpStatusCode OutcomeHttpStatusCode { get; init; }
     public bool EnabledByUrl { get; init; }
 
     public ChaosContext(HttpContext httpContext)
@@ -27,7 +27,7 @@ public class ChaosContext
         FaultInjectionRate = ChaosCommon.GetPropertyFromHttpHeader<double>(
             httpContext, ChaosCommon.CHAOS_FAULT_INJECTION_RATE);
         FaultException = ChaosCommon.GetExceptionFromString(
-            ChaosCommon.GetPropertyFromHttpHeader<string>(httpContext, 
+            ChaosCommon.GetPropertyFromHttpHeader<string>(httpContext,
             ChaosCommon.CHAOS_FAULT_EXCEPTION));
         OutcomeInjectionRate = default;
         OutcomeHttpStatusCode = default;
@@ -58,7 +58,8 @@ public class ChaosContext
         EnabledByUrl = ChaosCommon.IsInEnabledUrlList(chaosOptions.Outbound.EnabledUrlList, currentUrl);
     }
 
-    public void SetChaosPropertiesToResilienceContext(ResilienceContext resilienceContext) {
+    public void SetChaosPropertiesToResilienceContext(ResilienceContext resilienceContext)
+    {
         resilienceContext.Properties.Set(ResiliencePropertyKeys.ChaosEnabled, Enabled);
         resilienceContext.Properties.Set(ResiliencePropertyKeys.LatencyInjectionRate, LatencyInjectionRate);
         resilienceContext.Properties.Set(ResiliencePropertyKeys.LatencyDuration, LatencyDuration);

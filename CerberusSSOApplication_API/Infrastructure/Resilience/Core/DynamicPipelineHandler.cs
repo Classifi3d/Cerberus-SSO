@@ -1,7 +1,6 @@
-﻿using Infrastructure.Resilience.ChaosEngineering;
+using Infrastructure.Resilience.ChaosEngineering;
 using Microsoft.Extensions.Options;
 using Polly.Registry;
-using System;
 namespace Infrastructure.Resilience.Core;
 
 public class DynamicPipelineHandler : DelegatingHandler

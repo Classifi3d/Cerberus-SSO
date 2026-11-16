@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure.Extensions;
 
-public static class MessagingExtension 
+public static class MessagingExtension
 {
     public static IServiceCollection AddMessagingServices(this IServiceCollection services)
     {

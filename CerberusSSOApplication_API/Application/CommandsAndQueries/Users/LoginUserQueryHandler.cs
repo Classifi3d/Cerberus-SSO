@@ -1,4 +1,4 @@
-﻿using Application.Abstraction;
+using Application.Abstraction;
 using Application.Abstraction.CQRS;
 using Application.Abstraction.Services;
 using Application.DTOs;
@@ -35,7 +35,7 @@ public sealed class LoginUserQueryHandler : IQueryHandler<LoginUserQuery, LoginS
             return Result.Failure<LoginSecurityDTO>("Invalid credentials");
         }
 
-        var isPasswordMatching = _securityService.CheckPassword(loginDto.Password,user.Password);
+        var isPasswordMatching = _securityService.CheckPassword(loginDto.Password, user.Password);
         if (!isPasswordMatching)
         {
             return Result.Failure<LoginSecurityDTO>("Invalid credentials");

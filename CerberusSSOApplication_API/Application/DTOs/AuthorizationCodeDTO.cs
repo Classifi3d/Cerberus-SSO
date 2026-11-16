@@ -1,4 +1,4 @@
-﻿namespace Application.DTOs;
+namespace Application.DTOs;
 
 /// <summary>
 /// What is cached against an issued authorization code. The challenge and redirect

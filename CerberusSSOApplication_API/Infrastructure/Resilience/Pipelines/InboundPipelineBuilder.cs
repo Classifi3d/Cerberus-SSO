@@ -1,4 +1,4 @@
-﻿using Infrastructure.Resilience.ChaosEngineering;
+using Infrastructure.Resilience.ChaosEngineering;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Simmy;

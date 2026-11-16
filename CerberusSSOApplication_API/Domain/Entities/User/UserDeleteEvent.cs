@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.User;
+namespace Domain.Entities.User;
 
 public class UserDeleteEvent
 {

@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Domain.Entities.Client;
 using Domain.Entities.User;
 using Infrastructure.Outbox;

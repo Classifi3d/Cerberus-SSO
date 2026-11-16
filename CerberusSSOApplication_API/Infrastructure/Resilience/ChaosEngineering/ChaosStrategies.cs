@@ -1,4 +1,4 @@
-﻿using Infrastructure.Resilience.Keys;
+using Infrastructure.Resilience.Keys;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Simmy.Fault;
@@ -97,9 +97,10 @@ public static class ChaosStrategies
             },
             OutcomeGenerator = args =>
             {
-                if(!args.Context.Properties.TryGetValue(ResiliencePropertyKeys.OutcomeHttpStatusCode, out var status)){
+                if (!args.Context.Properties.TryGetValue(ResiliencePropertyKeys.OutcomeHttpStatusCode, out var status))
+                {
                     logger.LogWarning("ChaosPipeline with AddChaosOutcome has " +
-                    "LatencyGenerator with enabled set as {Status}", status);
+                        "LatencyGenerator with enabled set as {Status}", status);
                     return new ValueTask<Outcome<HttpResponseMessage>?>();
                 }
 

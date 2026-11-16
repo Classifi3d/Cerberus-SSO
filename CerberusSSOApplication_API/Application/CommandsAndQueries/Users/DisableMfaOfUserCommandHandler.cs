@@ -1,4 +1,4 @@
-﻿using Application.Abstraction;
+using Application.Abstraction;
 using Application.Abstraction.CQRS;
 using CSharpFunctionalExtensions;
 using Domain.Entities.User;
@@ -17,21 +17,21 @@ public sealed class DisableMfaOfUserCommandHandler : ICommandHandler<DisableMfaO
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result> Handle( DisableMfaOfUserCommand request, CancellationToken cancellationToken )
+    public async Task<Result> Handle(DisableMfaOfUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _unitOfWork.Repository<User>().GetByIdAsync(request.userId, cancellationToken);
 
-        if ( user is null )
+        if (user is null)
             return Result.Failure("User not found");
 
-        if ( !string.IsNullOrEmpty(user.MfaSecretKey) )
+        if (!string.IsNullOrEmpty(user.MfaSecretKey))
             return Result.Failure("MFA is already disabled for this user");
 
         user.MfaSecretKey = null;
-        user.IsMfaEnabled = true;
+        user.IsMfaEnabled = false;
 
         _unitOfWork.Repository<User>().Update(user);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesWithConcurrencyRetryAsync(cancellationToken);
 
         return Result.Success();
 

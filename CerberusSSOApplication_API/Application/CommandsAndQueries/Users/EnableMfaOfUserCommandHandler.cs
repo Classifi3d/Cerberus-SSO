@@ -1,4 +1,4 @@
-﻿using Application.Abstraction;
+using Application.Abstraction;
 using Application.Abstraction.CQRS;
 using Application.Abstraction.Services;
 using CSharpFunctionalExtensions;
@@ -35,7 +35,7 @@ public sealed class EnableMfaOfUserCommandHandler : ICommandHandler<EnableMfaOfU
         var encodedMfaKey = _securityService.GenerateEncodedMfaKey();
         var qrBytes = _securityService.GenerateQRCode(encodedMfaKey, user.Email);
 
-        if(qrBytes is null)
+        if (qrBytes is null)
         {
             return Result.Failure<byte[]>("QR Code cannot be generated");
         }
@@ -44,7 +44,7 @@ public sealed class EnableMfaOfUserCommandHandler : ICommandHandler<EnableMfaOfU
         user.IsMfaEnabled = true;
 
         _unitOfWork.Repository<User>().Update(user);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesWithConcurrencyRetryAsync(cancellationToken);
 
         return Result.Success<byte[]>(qrBytes);
     }

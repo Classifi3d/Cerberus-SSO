@@ -1,4 +1,4 @@
-﻿using Polly;
+using Polly;
 using Polly.Timeout;
 using System.Net;
 

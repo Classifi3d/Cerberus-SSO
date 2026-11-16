@@ -1,4 +1,4 @@
-﻿namespace Application.Abstraction.CQRS;
+namespace Application.Abstraction.CQRS;
 
 public interface ICommand : IBaseCommand { }
 

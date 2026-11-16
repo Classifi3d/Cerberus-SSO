@@ -1,4 +1,4 @@
-﻿using Domain.Entities.User;
+using Domain.Entities.User;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;

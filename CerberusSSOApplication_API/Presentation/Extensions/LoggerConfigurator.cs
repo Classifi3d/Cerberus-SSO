@@ -1,4 +1,4 @@
-﻿using Serilog;
+using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
@@ -26,7 +26,7 @@ public static class LoggerConfigurator
 
         // 4. Sinks
         var elasticUri = configuration.GetConnectionString("Elasticsearch");
-        
+
         serilogConfig
             .WriteTo.Console()
             .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri!))

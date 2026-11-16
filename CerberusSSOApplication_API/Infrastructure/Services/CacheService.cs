@@ -1,4 +1,4 @@
-﻿using Application.Abstraction.Services;
+using Application.Abstraction.Services;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -58,7 +58,7 @@ public class CacheService : ICacheService
             value = JsonSerializer.Deserialize<T>((string)redisValue!)!;
             return true;
         }
-        catch(Exception exception)
+        catch (Exception exception)
         {
             _logger.LogError("Error in CacheService in TryGetValue " +
                 "for key: {Key}. {Exception}", key, exception);
